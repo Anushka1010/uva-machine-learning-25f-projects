@@ -17,18 +17,27 @@ plt.rcParams['figure.figsize'] = (12, 8)
 plt.rcParams['font.size'] = 10
 
 
-def load_data(filepath='../data/dataset.csv'):
+def load_data(filepath=None):
     """Load and preprocess dataset."""
     print("Loading dataset...")
     import sys
     from pathlib import Path
+    
+    if filepath is None:
+        base_path = Path(__file__).parent.parent
+        filepath = str(base_path / 'data' / 'dataset.csv')
+    
     sys.path.insert(0, str(Path(__file__).parent))
     from data_preprocessing import preprocess_dataset
     df = preprocess_dataset(filepath)
     return df
 
 
-def plot_bpm_distribution(df, save_path='../plots/bpm_distribution.png'):
+def plot_bpm_distribution(df, save_path=None):
+    if save_path is None:
+        from pathlib import Path
+        src_path = Path(__file__).parent
+        save_path = str(src_path / 'plots' / 'bpm_distribution.png')
     """Plot BPM distribution across the dataset."""
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     
@@ -63,7 +72,11 @@ def plot_bpm_distribution(df, save_path='../plots/bpm_distribution.png'):
     plt.close()
 
 
-def plot_key_distribution(df, save_path='../plots/key_distribution.png'):
+def plot_key_distribution(df, save_path=None):
+    if save_path is None:
+        from pathlib import Path
+        src_path = Path(__file__).parent
+        save_path = str(src_path / 'plots' / 'key_distribution.png')
     """Plot key distribution (Camelot Wheel)."""
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     
@@ -94,7 +107,11 @@ def plot_key_distribution(df, save_path='../plots/key_distribution.png'):
     plt.close()
 
 
-def plot_energy_distribution(df, save_path='../plots/energy_distribution.png'):
+def plot_energy_distribution(df, save_path=None):
+    if save_path is None:
+        from pathlib import Path
+        src_path = Path(__file__).parent
+        save_path = str(src_path / 'plots' / 'energy_distribution.png')
     """Plot energy distribution and correlation with BPM."""
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     
@@ -124,7 +141,11 @@ def plot_energy_distribution(df, save_path='../plots/energy_distribution.png'):
     plt.close()
 
 
-def plot_audio_features_correlation(df, save_path='../plots/audio_features_correlation.png'):
+def plot_audio_features_correlation(df, save_path=None):
+    if save_path is None:
+        from pathlib import Path
+        src_path = Path(__file__).parent
+        save_path = str(src_path / 'plots' / 'audio_features_correlation.png')
     """Plot correlation matrix of audio features."""
     audio_features = ['energy', 'valence', 'danceability', 'acousticness', 
                      'instrumentalness', 'loudness', 'speechiness', 'liveness', 'tempo']
@@ -148,7 +169,11 @@ def plot_audio_features_correlation(df, save_path='../plots/audio_features_corre
     plt.close()
 
 
-def plot_model_comparison(results_dict, save_path='../plots/model_comparison.png'):
+def plot_model_comparison(results_dict, save_path=None):
+    if save_path is None:
+        from pathlib import Path
+        src_path = Path(__file__).parent
+        save_path = str(src_path / 'plots' / 'model_comparison.png')
     """Plot comparison of different models' performance."""
     if not results_dict:
         print("No results provided for model comparison")
@@ -182,7 +207,11 @@ def plot_model_comparison(results_dict, save_path='../plots/model_comparison.png
     plt.close()
 
 
-def plot_feature_importance(feature_importance_dict, save_path='../plots/feature_importance.png'):
+def plot_feature_importance(feature_importance_dict, save_path=None):
+    if save_path is None:
+        from pathlib import Path
+        src_path = Path(__file__).parent
+        save_path = str(src_path / 'plots' / 'feature_importance.png')
     """Plot feature importance for hybrid ML model."""
     if not feature_importance_dict:
         print("No feature importance data provided")
@@ -214,7 +243,11 @@ def plot_feature_importance(feature_importance_dict, save_path='../plots/feature
     plt.close()
 
 
-def plot_recommendation_example(current_song, recommendations, model_name, save_path='../plots/recommendation_example.png'):
+def plot_recommendation_example(current_song, recommendations, model_name, save_path=None):
+    if save_path is None:
+        from pathlib import Path
+        src_path = Path(__file__).parent
+        save_path = str(src_path / 'plots' / 'recommendation_example.png')
     """Plot example recommendations with BPM, Key, and Energy."""
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
     
@@ -281,7 +314,11 @@ def plot_recommendation_example(current_song, recommendations, model_name, save_
     plt.close()
 
 
-def plot_bpm_tolerance_analysis(df, save_path='../plots/bpm_tolerance_analysis.png'):
+def plot_bpm_tolerance_analysis(df, save_path=None):
+    if save_path is None:
+        from pathlib import Path
+        src_path = Path(__file__).parent
+        save_path = str(src_path / 'plots' / 'bpm_tolerance_analysis.png')
     """Analyze how BPM tolerance affects number of compatible songs."""
     # Sample a few songs for analysis
     sample_songs = df.sample(min(100, len(df)))
@@ -324,8 +361,11 @@ def generate_all_visualizations(df, results_dict=None, feature_importance=None):
     print("Generating Visualizations")
     print("="*60)
     
-    # Create plots directory
-    Path('../plots').mkdir(parents=True, exist_ok=True)
+    # Create plots directory inside src/
+    from pathlib import Path
+    src_path = Path(__file__).parent
+    plots_dir = src_path / 'plots'
+    plots_dir.mkdir(parents=True, exist_ok=True)
     
     # Data exploration plots
     print("\n1. Creating data exploration plots...")
@@ -345,7 +385,7 @@ def generate_all_visualizations(df, results_dict=None, feature_importance=None):
         plot_feature_importance(feature_importance)
     
     print("\n" + "="*60)
-    print("All visualizations saved to '../plots/' directory")
+    print(f"All visualizations saved to 'src/plots/' directory")
     print("="*60)
 
 
