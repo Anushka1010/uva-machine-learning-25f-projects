@@ -1,34 +1,84 @@
-# uva-machine-learning-25f-projects
+# Local RAG Vector Search System
 
-For those who haven't submitted your project code yet, please follow the instructions below to upload your work to the course repository.
+Upload your documents and ask questions about them. Everything stays on your computer—no cloud, no sending data anywhere. Uses Ollama to run an LLM locally.
 
-Step 1: Set up your local branch
-- Go to the course repository and click Fork: https://github.com/Qdata4Capstone/uva-machine-learning-25f-projects
-- Go to your new forked repository and clone it to your local environment:
-  - git clone https://github.com/<your-username>/uva-machine-learning-25f-projects.git
-- Navigate into the cloned folder and add the original repository as an upstream remote:
-  - git remote add upstream https://github.com/Qdata4Capstone/uva-machine-learning-25f-projects.git
+## What you need
 
-Step 2: Prepare your code:
-- For each team, please create a folder named `team-XX` corresponding to your team ID (e.g., team-1, team-11, team-111). 
-- Inside this folder, include the following:
-  - src/: A subfolder containing all source code.
-  - data/: A subfolder with the data required to reproduce results.
-    - Note: If the data cannot be uploaded, include a markdown file describing how to collect it.
-  - `requirements.txt`: A file listing required packages. (Format [reference](https://pip.pypa.io/en/stable/reference/requirements-file-format/))
-  - `README.md`: A markdown file describing the folder content. You can view an example [here](https://github.com/QData/TextAttack). Your README should include:
-    - Project Title
-    - Team ID and Members
-    - Overview: A brief introduction to the project.
-    - Usage: How to run the code to get core results.
-    - (Optional) Setup: Instructions for environment setup (if non-trivial).
-    - (Optional) Video: A link to your demo video with a brief description.
-- You are also welcome to include additional files or documentation in the folder or README.md if they help people better understand your project and code.
+- Python 3.9+
+- Node.js 18+
+- Ollama
 
-Step 3: Upload your code
-- Commit your changes (no requirements on the commit message)
-  - git add .
-  - git commit -m "upload project code by Team-XX"
-- Push the changes to your fork
-  - git push origin main
-- On GitHub, navigate to your fork and open a pull request via: Pull requests → New pull request
+## Getting it running
+
+**Start the backend** (Terminal 1):
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python -m app.main
+```
+It'll run on `http://localhost:8000`
+
+**Start the frontend** (Terminal 2):
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Go to `http://localhost:5173`
+
+**Start Ollama** (Terminal 3):
+```bash
+ollama serve
+# In another terminal:
+ollama pull llama3.2
+```
+
+## How to use it
+
+1. Go to `http://localhost:5173`
+2. Upload a PDF, Word doc, text file, or markdown
+3. Pick which files you want to search
+4. Ask a question
+5. Get back an answer with the source chunks
+
+We've got `sample_document.md` in the folder if you want to test it out.
+
+## How it works
+
+You upload a file → we split it into chunks → turn each chunk into embeddings → store them in a database → when you search, we find the closest chunks → send those to an LLM → get an answer.
+
+Using:
+- **Embeddings:** all-MiniLM-L6-v2 (small, local, works fast)
+- **Database:** FAISS (stores vectors locally)
+- **LLM:** Ollama (runs on your machine)
+- **Frontend:** React + Vite
+- **Backend:** FastAPI
+
+## Stuff that breaks
+
+**Ports already taken?**
+```bash
+lsof -ti:8000 | xargs kill -9    # Kill backend
+lsof -ti:5173 | xargs kill -9    # Kill frontend
+lsof -ti:11434 | xargs kill -9   # Kill Ollama
+```
+
+**TypeScript errors?** Run `npm install` in the frontend folder and reload VS Code.
+
+**Ollama isn't working?** Make sure you ran `ollama serve`.
+
+**No answers coming back?** The search still works, you'll just see the document chunks without LLM answers.
+
+**Can't upload files?** Make sure `data/uploads/` exists and your file isn't corrupted.
+
+**No search results?** Check that files are actually selected and try a more specific question.
+
+## What's where
+
+- `backend/` - FastAPI app that handles search and embedding
+- `frontend/` - React interface
+- `data/uploads/` - Your uploaded documents
+- `data/vectordb/` - The vector database
+- `sample_document.md` - Example file to test with
