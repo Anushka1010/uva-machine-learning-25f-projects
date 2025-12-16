@@ -26,6 +26,11 @@ step 2: Install dependencies: pip install -r requirements.txt
 ## Link to the video
 待定
 
+
+## Links to our data
+https://www.kaggle.com/datasets/quanghn2001/image-mushroom-dataset?resource=download
+## Link to our slides 
+https://www.canva.com/design/DAG5ecEw8XE/YwEtQcNrUhZ7R1tbytkU7Q/edit
 ## Project structure
 
 ```text
