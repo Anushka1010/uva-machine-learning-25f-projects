@@ -1,0 +1,147 @@
+global:
+  resolve_timeout: 5m
+  # Slack webhook (configure your own)
+  slack_api_url: 'YOUR_SLACK_WEBHOOK_URL'
+
+# Route tree
+route:
+  group_by: ['alertname', 'component', 'severity']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  receiver: 'default'
+
+  routes:
+    # Critical alerts - immediate notification
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      repeat_interval: 1h
+
+    # Fairness/compliance alerts - high priority
+    - match:
+        component: fairness
+      receiver: 'compliance-team'
+      repeat_interval: 6h
+
+    # Warning alerts - less urgent
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+      repeat_interval: 12h
+
+    # Info alerts - low priority
+    - match:
+        severity: info
+      receiver: 'info-alerts'
+      repeat_interval: 24h
+
+# Notification receivers
+receivers:
+  - name: 'default'
+    slack_configs:
+      - channel: '#credit-model-alerts'
+        title: 'Credit Model Alert'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          *Component:* {{ .Labels.component }}
+          {{ if .Annotations.dashboard }}*Dashboard:* {{ .Annotations.dashboard }}{{ end }}
+          {{ if .Annotations.remediation }}*Remediation:* `{{ .Annotations.remediation }}`{{ end }}
+          {{ end }}
+
+  - name: 'critical-alerts'
+    # Email notifications
+    email_configs:
+      - to: 'alerts@example.com'
+        from: 'prometheus@example.com'
+        smarthost: 'smtp.example.com:587'
+        auth_username: 'prometheus@example.com'
+        auth_password: 'YOUR_PASSWORD'
+        headers:
+          Subject: '[CRITICAL] Credit Model Alert'
+
+    # Slack notifications
+    slack_configs:
+      - channel: '#credit-model-critical'
+        title: ':rotating_light: CRITICAL ALERT'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ if .Annotations.remediation }}*Action Required:* `{{ .Annotations.remediation }}`{{ end }}
+          {{ if .Annotations.dashboard }}*Dashboard:* {{ .Annotations.dashboard }}{{ end }}
+          {{ end }}
+        send_resolved: true
+
+    # PagerDuty (configure your service key)
+    pagerduty_configs:
+      - service_key: 'YOUR_PAGERDUTY_SERVICE_KEY'
+        description: '{{ .GroupLabels.alertname }}: {{ .Annotations.summary }}'
+
+  - name: 'compliance-team'
+    email_configs:
+      - to: 'compliance@example.com,fairness-team@example.com'
+        from: 'prometheus@example.com'
+        smarthost: 'smtp.example.com:587'
+        auth_username: 'prometheus@example.com'
+        auth_password: 'YOUR_PASSWORD'
+        headers:
+          Subject: '[FAIRNESS ALERT] Credit Model Compliance Issue'
+
+    slack_configs:
+      - channel: '#compliance-alerts'
+        title: ':balance_scale: Fairness/Compliance Alert'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ if .Labels.compliance }}*Compliance Rule:* {{ .Labels.compliance }}{{ end }}
+          *Dashboard:* {{ .Annotations.dashboard }}
+          {{ if .Annotations.remediation }}*Recommended Action:* `{{ .Annotations.remediation }}`{{ end }}
+          {{ end }}
+
+  - name: 'warning-alerts'
+    slack_configs:
+      - channel: '#credit-model-warnings'
+        title: ':warning: Warning Alert'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ if .Annotations.dashboard }}*Dashboard:* {{ .Annotations.dashboard }}{{ end }}
+          {{ end }}
+        send_resolved: true
+
+  - name: 'info-alerts'
+    slack_configs:
+      - channel: '#credit-model-info'
+        title: 'ℹ️ Info Alert'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+
+# Inhibition rules - suppress certain alerts when others are firing
+inhibit_rules:
+  # If API is down, don't alert on model not loaded
+  - source_match:
+      alertname: 'APIDown'
+    target_match:
+      alertname: 'ModelNotLoaded'
+    equal: ['instance']
+
+  # If critical calibration alert, suppress warning
+  - source_match:
+      alertname: 'PoorModelCalibration'
+      severity: 'critical'
+    target_match:
+      alertname: 'AcceptableCalibrationDrift'
+      severity: 'warning'
+
+  # If critical data quality, suppress warning
+  - source_match:
+      alertname: 'CriticalDataQuality'
+      severity: 'critical'
+    target_match:
+      alertname: 'DataQualityDegradation'
+      severity: 'warning'

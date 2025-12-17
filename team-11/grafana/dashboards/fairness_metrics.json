@@ -1,0 +1,279 @@
+{
+  "dashboard": {
+    "title": "Credit Model - Fairness Metrics",
+    "tags": ["credit", "fairness", "compliance"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 0,
+    "refresh": "1m",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Disparate Impact Ratio",
+        "type": "gauge",
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "fairness_disparate_impact",
+            "refId": "A",
+            "legendFormat": "Disparate Impact"
+          }
+        ],
+        "description": "Target: ≥ 0.80 (Four-Fifths Rule)",
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 0.8, "color": "green"},
+                {"value": 1.2, "color": "yellow"},
+                {"value": 1.5, "color": "red"}
+              ]
+            },
+            "min": 0,
+            "max": 2,
+            "unit": "short"
+          }
+        },
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        }
+      },
+      {
+        "id": 2,
+        "title": "Statistical Parity Difference",
+        "type": "gauge",
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 0},
+        "targets": [
+          {
+            "expr": "fairness_statistical_parity_diff",
+            "refId": "A",
+            "legendFormat": "Stat Parity Diff"
+          }
+        ],
+        "description": "Target: < 0.05 (5% difference)",
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": -0.2, "color": "red"},
+                {"value": -0.05, "color": "yellow"},
+                {"value": 0, "color": "green"},
+                {"value": 0.05, "color": "yellow"},
+                {"value": 0.2, "color": "red"}
+              ]
+            },
+            "min": -0.5,
+            "max": 0.5,
+            "unit": "percentunit"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Equalized Odds Difference",
+        "type": "gauge",
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 0},
+        "targets": [
+          {
+            "expr": "fairness_equalized_odds_diff",
+            "refId": "A",
+            "legendFormat": "Equal Odds Diff"
+          }
+        ],
+        "description": "Target: < 0.10 (10% difference)",
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": -0.3, "color": "red"},
+                {"value": -0.1, "color": "yellow"},
+                {"value": 0, "color": "green"},
+                {"value": 0.1, "color": "yellow"},
+                {"value": 0.3, "color": "red"}
+              ]
+            },
+            "min": -0.5,
+            "max": 0.5,
+            "unit": "percentunit"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Fairness Metrics Over Time",
+        "type": "graph",
+        "gridPos": {"h": 10, "w": 24, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "fairness_disparate_impact",
+            "refId": "A",
+            "legendFormat": "Disparate Impact (Target: ≥0.80)"
+          },
+          {
+            "expr": "abs(fairness_statistical_parity_diff)",
+            "refId": "B",
+            "legendFormat": "Statistical Parity |Diff| (Target: <0.05)"
+          },
+          {
+            "expr": "abs(fairness_equalized_odds_diff)",
+            "refId": "C",
+            "legendFormat": "Equalized Odds |Diff| (Target: <0.10)"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "logBase": 1, "min": 0, "max": 2},
+          {"format": "short", "logBase": 1}
+        ],
+        "legend": {
+          "show": true,
+          "alignAsTable": true,
+          "avg": true,
+          "current": true,
+          "max": true,
+          "min": true
+        },
+        "seriesOverrides": [
+          {
+            "alias": "Disparate Impact (Target: ≥0.80)",
+            "yaxis": 1
+          },
+          {
+            "alias": "Statistical Parity |Diff| (Target: <0.05)",
+            "yaxis": 2
+          },
+          {
+            "alias": "Equalized Odds |Diff| (Target: <0.10)",
+            "yaxis": 2
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Approval Rate by Group",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 18},
+        "targets": [
+          {
+            "expr": "sum(rate(predictions_total{outcome=\"approved\"}[5m])) by (group) / sum(rate(predictions_total[5m])) by (group)",
+            "refId": "A",
+            "legendFormat": "{{group}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "percentunit", "logBase": 1, "min": 0, "max": 1},
+          {"format": "short", "logBase": 1}
+        ],
+        "legend": {
+          "show": true,
+          "alignAsTable": true,
+          "avg": true,
+          "current": true
+        }
+      },
+      {
+        "id": 6,
+        "title": "Prediction Volume by Group",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 18},
+        "targets": [
+          {
+            "expr": "rate(predictions_total[1m])",
+            "refId": "A",
+            "legendFormat": "{{group}} - {{outcome}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "ops", "logBase": 1},
+          {"format": "short", "logBase": 1}
+        ],
+        "legend": {
+          "show": true,
+          "alignAsTable": true,
+          "avg": true,
+          "current": true
+        },
+        "stack": true
+      },
+      {
+        "id": 7,
+        "title": "Fairness Compliance Status",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 26},
+        "targets": [
+          {
+            "expr": "fairness_disparate_impact",
+            "refId": "A",
+            "format": "table",
+            "instant": true
+          },
+          {
+            "expr": "fairness_statistical_parity_diff",
+            "refId": "B",
+            "format": "table",
+            "instant": true
+          },
+          {
+            "expr": "fairness_equalized_odds_diff",
+            "refId": "C",
+            "format": "table",
+            "instant": true
+          }
+        ],
+        "transformations": [
+          {
+            "id": "merge",
+            "options": {}
+          }
+        ],
+        "options": {
+          "showHeader": true,
+          "sortBy": []
+        },
+        "fieldConfig": {
+          "overrides": [
+            {
+              "matcher": {"id": "byName", "options": "Disparate Impact"},
+              "properties": [
+                {
+                  "id": "thresholds",
+                  "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      {"value": 0, "color": "red"},
+                      {"value": 0.8, "color": "green"}
+                    ]
+                  }
+                },
+                {"id": "custom.displayMode", "value": "color-background"}
+              ]
+            },
+            {
+              "matcher": {"id": "byName", "options": "Statistical Parity Diff"},
+              "properties": [
+                {
+                  "id": "thresholds",
+                  "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      {"value": -0.05, "color": "green"},
+                      {"value": -0.1, "color": "yellow"},
+                      {"value": -0.2, "color": "red"},
+                      {"value": 0.05, "color": "yellow"},
+                      {"value": 0.2, "color": "red"}
+                    ]
+                  }
+                },
+                {"id": "custom.displayMode", "value": "color-background"}
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

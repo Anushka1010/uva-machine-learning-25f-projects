@@ -1,0 +1,124 @@
+# docker-compose.yml
+# Fair Credit Score Prediction - Full Stack
+
+version: '3.8'
+
+services:
+  # ============================================
+  # Main API Service
+  # ============================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: fair-credit-api
+    volumes:
+      - ./models:/app/models:ro
+      - ./logs:/app/logs
+    environment:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+      - MODEL_PATH=/app/models/credit_model.pkl
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - fair-credit-network
+
+  # ============================================
+  # Training Pipeline (run on-demand)
+  # ============================================
+  training:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fair-credit-training
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./explanations:/app/explanations
+      - ./reports:/app/reports
+      - ./logs:/app/logs
+      - ./config:/app/config:ro
+    environment:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+    profiles:
+      - training  # Only run when explicitly requested
+    command: ["python", "-m", "src.main", "run", "--data-path", "/app/data/credit.csv"]
+    networks:
+      - fair-credit-network
+
+  # ============================================
+  # Monitoring: Prometheus
+  # ============================================
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    restart: unless-stopped
+    profiles:
+      - monitoring
+    networks:
+      - fair-credit-network
+
+  # ============================================
+  # Monitoring: Grafana
+  # ============================================
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    profiles:
+      - monitoring
+    depends_on:
+      - prometheus
+    networks:
+      - fair-credit-network
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  fair-credit-network:
+    driver: bridge
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  prometheus-data:
+  grafana-data:
