@@ -1,0 +1,6 @@
+# pip formatting
+numpy
+scikit-learn
+matplotlib
+pandas
+torch
