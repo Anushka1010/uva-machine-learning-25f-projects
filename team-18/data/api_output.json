@@ -1,0 +1,39 @@
+{
+  "verifier_input": {
+    "program": [
+      {
+        "step": 1,
+        "instr": "ReadRowToSa(dram_row=ROW10)"
+      },
+      {
+        "step": 2,
+        "instr": "Swap(rr_index=1)"
+      },
+      {
+        "step": 3,
+        "instr": "ReadRowToSa(dram_row=ROW11)"
+      },
+      {
+        "step": 4,
+        "instr": "NOR()"
+      },
+      {
+        "step": 5,
+        "instr": "WriteSaToRow(dram_row=ROW12)"
+      }
+    ],
+    "io": {
+      "input_rows": [
+        "ROW10",
+        "ROW11"
+      ],
+      "output_row": "ROW12",
+      "bitwidth": 32
+    }
+  },
+  "reasoning_summary": [
+    "Load A to RR0, swap to RR1 to preserve it.",
+    "Load B to RR0; NOR uses RR0 and RR1, result in RR0.",
+    "Write RR0 to ROW12 using allowed ops and registers."
+  ]
+}
