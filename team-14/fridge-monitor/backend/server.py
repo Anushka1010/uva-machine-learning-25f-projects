@@ -22,7 +22,10 @@ from api import (
     add_entry, 
     get_drive_creds, 
     get_drive_file_url_and_set_permission, 
-    upload_photo_to_drive
+    upload_photo_to_drive,
+    load_model,
+    CNN,
+    analyze_photo_pytorch
 )
 
 # load environment variables
@@ -132,6 +135,9 @@ CORS(app)
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# load model
+model = load_model()
+
 @app.route('/api/scan', methods=['POST'])
 def scan_image():
     if 'file' not in request.files:
@@ -144,7 +150,7 @@ def scan_image():
     if file:
         try:
             image_bytes = file.read()
-            food_name = analyze_photo_pytorch(image_bytes)
+            food_name = analyze_photo_pytorch(model, image_bytes)
             timestamp = time.strftime('%Y%m%d_%H%M%S')
             safe_name = food_name.replace(' ', '_').lower()
             drive_filename = f"{safe_name}_{timestamp}.jpg"
