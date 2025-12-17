@@ -7,43 +7,96 @@ import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import Badge from "@/components/ui/Badge";
 import { useEffect, useMemo, useState } from "react";
-import { api_listItems, api_patchItem } from "@/lib/mockDb";
 import { formatDate } from "@/lib/utils";
-import type { Item } from "@/lib/types";
+import type { Item } from "@/lib/types"; 
 import Link from "next/link";
 import { getCategoryImage } from "@/lib/categoryImages";
+
+const FLASK_API_URL = "http://127.0.0.1:5000"; 
 
 export default function InventoryPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"in_fridge" | "removed">("in_fridge");
 
+  // fetch inventory items from backend 
   async function load() {
-    const it = await api_listItems(status);
-    setItems(it);
+    console.log(`Fetching items with status: ${status}`);
+    try {
+      const response = await fetch(`${FLASK_API_URL}/api/inventory`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setItems(data as Item[]);
+    } catch (error) {
+      console.error("Failed to load inventory from server:", error);
+      setItems([]);
+    }
   }
+  
+  // send patch request to edit item
+  async function patchItem(itemId: string, updateData: Partial<Item>) {
+    try {
+        const response = await fetch(`${FLASK_API_URL}/api/inventory/${itemId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updateData),
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.json();
+            throw new Error(`Update failed: ${response.status} - ${errorBody.error || errorBody.message}`);
+        }
+        
+        console.log(`Item ${itemId} updated successfully.`);
+        return true;
+    } catch (error) {
+        console.error("Error updating item:", error);
+        return false;
+    }
+  }
+
 
   useEffect(() => { load(); }, [status]);
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
     return items.filter(i =>
-      !s || i.label.toLowerCase().includes(s) || i.category.toLowerCase().includes(s)
+      !s || i.name.toLowerCase().includes(s) || i.category?.toLowerCase().includes(s) 
     );
   }, [items, q]);
 
   async function editExpiry(item: Item) {
-    const val = prompt("Enter expiration date (YYYY-MM-DD) or ISO string:", item.expiresAt ?? "");
+    const val = window.prompt(`Enter expiration date (YYYY-MM-DD) for ${item.name}:`, item.expiresAt?.substring(0, 10) ?? "");
     if (!val) return;
+    
+    // date validation
     const d = new Date(val);
-    if (isNaN(d.getTime())) return alert("Invalid date");
-    await api_patchItem(item.id, { expiresAt: d.toISOString() });
-    load();
+    if (isNaN(d.getTime())) {
+        console.error("Invalid date entered.");
+        return;
+    }
+    
+    const isoString = d.toISOString();
+    
+    // call patch function
+    const success = await patchItem(item._id, { expiresAt: isoString });
+    if (success) {
+        load();
+    }
   }
 
   async function markRemoved(item: Item) {
-    await api_patchItem(item.id, { status: "removed" });
-    load();
+    // call patch function
+    const success = await patchItem(item._id, { status: "removed" });
+    if (success) {
+        load();
+    }
   }
 
   return (
@@ -59,7 +112,7 @@ export default function InventoryPage() {
 
         <div className="flex flex-wrap gap-2 items-center">
           <div className="w-64"><Input placeholder="Search items…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
-          <Select value={status} onChange={(e) => setStatus(e.target.value as any)}>
+          <Select value={status} onChange={(e) => setStatus(e.target.value as "in_fridge" | "removed")}>
             <option value="in_fridge">In fridge</option>
             <option value="removed">Removed</option>
           </Select>
@@ -68,15 +121,15 @@ export default function InventoryPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {filtered.map((i) => (
-            <Card key={i.id} className="p-3">
-            <Link href={`/inventory/${i.id}`} className="block">
+            <Card key={i._id} className="p-3">
+            <Link href={`/inventory/${i._id}`} className="block">
               <div className="flex gap-3">
                 <div className="w-16 h-16 rounded bg-gray-100 overflow-hidden border flex items-center justify-center">
-                  {getCategoryImage(i.label) ? (
+                  {getCategoryImage(i.name) ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={getCategoryImage(i.label)!}
-                      alt={i.label}
+                      src={getCategoryImage(i.name)!}
+                      alt={i.name}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -86,8 +139,9 @@ export default function InventoryPage() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <div className="font-medium">{i.label}</div>
-                  <div className="text-xs text-gray-600">{i.category} • conf {Math.round(i.confidence * 100)}%</div>
+                  <div className="font-medium">{i.name}</div>
+                  {/* Note: I added optional chaining ? to category since Item definition is not provided */}
+                  <div className="text-xs text-gray-600">{i.category} • conf {Math.round(i.confidence * 100)}%</div> 
                   <div className="text-xs text-gray-600 mt-1">Added: {formatDate(i.createdAt)}</div>
                   <div className="text-sm mt-1">Exp: {formatDate(i.expiresAt)}</div>
                 </div>
@@ -95,11 +149,12 @@ export default function InventoryPage() {
               </Link>
 
               <div className="mt-3 flex gap-2">
-                <Button variant="secondary" className="text-xs px-2 py-1" onClick={() => editExpiry(i)}>
+                {/* Prevent default action of link by setting onClick on button */}
+                <Button variant="secondary" className="text-xs px-2 py-1" onClick={(e) => { e.preventDefault(); editExpiry(i); }}>
                   Edit expiry
                 </Button>
                 {status === "in_fridge" && (
-                  <Button variant="secondary" className="text-xs px-2 py-1" onClick={() => markRemoved(i)}>
+                  <Button variant="secondary" className="text-xs px-2 py-1" onClick={(e) => { e.preventDefault(); markRemoved(i); }}>
                     Mark removed
                   </Button>
                 )}

@@ -28,8 +28,13 @@ def query(client: MongoClient, db_name: str, col_name: str, query: dict) -> list
     mycol = mydb[col_name]
 
     mydoc = mycol.find(query)
+    results = []
 
-    return [item for item in mydoc]
+    for item in mydoc:
+        item['_id'] = str(item['_id'])    
+        results.append(item)
+
+    return results
 
 # add entry to database 
 def add_entry(client: MongoClient, db_name: str, col_name: str, entry: dict):

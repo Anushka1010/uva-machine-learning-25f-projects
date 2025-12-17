@@ -1,8 +1,8 @@
 export type ItemStatus = "in_fridge" | "removed";
 
 export type Item = {
-  id: string;
-  label: string;
+  _id: string;
+  name: string;
   category: string;
   confidence: number;
   createdAt: string;   // ISO

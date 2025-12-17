@@ -1,16 +1,31 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+from api import connect_mongo, query
+from dotenv import load_dotenv
 
+# load environment variables
+load_dotenv()
+
+# flask app setup
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
+# create uploads folder
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# database setup
+URI = os.getenv('URI')
+DB_NAME = os.getenv('DB_NAME')
+COL_NAME = os.getenv('COL_NAME')
+
+# initialize client
+mongo_client = connect_mongo(URI)
+
+# api endpoints
 @app.route('/api/scan', methods=['POST'])
 def scan_image():
-    # check if file exists
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
     
@@ -21,11 +36,10 @@ def scan_image():
         return jsonify({"error": "No selected file"}), 400
 
     if file:
-        # save file locally 
         filepath = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filepath)
 
-        # run inference
+        # mock inference result
         dummy_result = {
             "status": "success",
             "filename": file.filename,
@@ -37,7 +51,6 @@ def scan_image():
 
 @app.route('/api/manual-add', methods=['POST'])
 def manual_add():
-    # handle JSON data
     data = request.json
     label = data.get('label')
     
@@ -47,5 +60,11 @@ def manual_add():
         "item": label
     }), 200
 
+@app.route('/api/inventory', methods=['GET'])
+def list_inventory():
+    items = query(mongo_client, DB_NAME, COL_NAME, {})
+    
+    return jsonify(items), 200
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='127.0.0.1', port=5000)
