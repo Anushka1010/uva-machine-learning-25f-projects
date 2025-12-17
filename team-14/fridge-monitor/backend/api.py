@@ -3,8 +3,8 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
 # for ai
-from google import genai
-from google.genai import types
+import google.generativeai as genai
+from google.generativeai import types
 
 # for google drive
 import io
@@ -52,22 +52,20 @@ def add_entry(client: MongoClient, db_name: str, col_name: str, entry: dict):
     x = mycol.insert_one(entry)
 
 # method to connect to gemini client
-def connect_gemini(key: str) -> genai.Client:
-    return genai.Client(api_key=key)
+def connect_gemini(key: str):
+    genai.configure(api_key=key)
+    return genai.GenerativeModel('gemini-1.5-flash')
 
 # send photo and query to gemini
-def analyze_photo(client: genai.Client, image_bytes: bytes, inquiry: str) -> str:
-    response = client.models.generate_content(
-        model='gemini-2.5-flash',
-        contents=[
-            types.Part.from_bytes(
-            data=image_bytes,
-            mime_type='image/jpeg',
-            ),
-            inquiry
-        ]
-    )
-
+def analyze_photo(model, image_bytes: bytes, inquiry: str) -> str:
+    response = model.generate_content([
+        genai.types.Content(
+            parts=[
+                genai.types.Part.from_bytes(data=image_bytes, mime_type='image/jpeg'),
+                genai.types.Part.from_text(text=inquiry)
+            ]
+        )
+    ])
     return response.text
 
 # get creds for google drive

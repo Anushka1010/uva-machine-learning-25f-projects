@@ -6,28 +6,69 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { useEffect, useMemo, useState } from "react";
-import { api_alerts, api_listEvents, api_listItems } from "@/lib/mockDb";
+import { api_listItems } from "@/lib/mockDb";
 import { daysLeft, formatDate } from "@/lib/utils";
 import type { Item } from "@/lib/types";
 import { getCategoryImage } from "@/lib/categoryImages";
 
+const FLASK_API_URL = "http://127.0.0.1:5000";
+
 export default function Page() {
-  const [items, setItems] = useState<Item[]>([]);
-  const [events, setEvents] = useState<any[]>([]);
-  const [alerts, setAlerts] = useState<any[]>([]);
+  const [items, setItems] = useState<any[]>([]);
 
   async function load() {
-    const [it, ev, al] = await Promise.all([
-      api_listItems("in_fridge"),
-      api_listEvents(),
-      api_alerts(),
-    ]);
-    setItems(it);
-    setEvents(ev.slice(0, 10));
-    setAlerts(al);
+    try {
+      const invRes = await fetch(`${FLASK_API_URL}/api/inventory`);
+      const invData = await invRes.json();
+      setItems(invData);
+    } catch (error) {
+      console.error("Failed to load data:", error);
+      setItems([]);
+    }
   }
 
   useEffect(() => { load(); }, []);
+
+  const alerts = useMemo(() => {
+    const now = new Date();
+    const out: Array<{ type: string; message: string; itemId: string }> = [];
+
+    for (const it of items) {
+      if (it.status !== "in_fridge" || !it.expiration_date) continue;
+
+      const created = new Date(it.date_placed);
+      const expires = new Date(it.expiration_date);
+
+      const total = expires.getTime() - created.getTime();
+      const used = now.getTime() - created.getTime();
+      const pct = total > 0 ? used / total : 0;
+      const daysLeft = (expires.getTime() - now.getTime()) / 86400000;
+
+      if (pct >= 0.66 && pct <= 0.75) {
+        out.push({
+          type: "shelf_life",
+          message: `${it.name} is ~${Math.round(pct * 100)}% through shelf life`,
+          itemId: it._id,
+        });
+      }
+      if (daysLeft >= 0 && daysLeft <= 1.1) {
+        out.push({
+          type: "one_day",
+          message: `${it.name} expires in ~1 day`,
+          itemId: it._id,
+        });
+      }
+      if (daysLeft < 0) {
+        out.push({
+          type: "expired",
+          message: `${it.name} has expired`,
+          itemId: it._id,
+        });
+      }
+    }
+
+    return out;
+  }, [items]);
 
   const expSoon = useMemo(() => {
     return [...items]
@@ -122,33 +163,6 @@ export default function Page() {
             {alerts.length === 0 && (
               <div className="p-3 text-sm text-gray-600">No alerts right now.</div>
             )}
-          </Card>
-        </section>
-
-        <section className="space-y-2">
-          <h2 className="font-semibold">Recent Activity</h2>
-          <Card className="overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="text-left p-3">Time</th>
-                  <th className="text-left p-3">Type</th>
-                  <th className="text-left p-3">Summary</th>
-                </tr>
-              </thead>
-              <tbody>
-                {events.map((e: any) => (
-                  <tr key={e.id} className="border-t">
-                    <td className="p-3 text-gray-700">{formatDate(e.timestamp)}</td>
-                    <td className="p-3"><Badge>{e.type}</Badge></td>
-                    <td className="p-3">{e.resultSummary}</td>
-                  </tr>
-                ))}
-                {events.length === 0 && (
-                  <tr><td className="p-3 text-sm text-gray-600" colSpan={3}>No events yet.</td></tr>
-                )}
-              </tbody>
-            </table>
           </Card>
         </section>
       </div>

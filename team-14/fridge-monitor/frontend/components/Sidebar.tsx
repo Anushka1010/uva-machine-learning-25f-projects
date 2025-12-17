@@ -7,7 +7,6 @@ import { clsx } from "@/lib/utils";
 const nav = [
   { href: "/", label: "Dashboard" },
   { href: "/inventory", label: "Inventory" },
-  { href: "/scan", label: "Scan & Events" },
   { href: "/recipes", label: "Recipes" },
   { href: "/settings", label: "Settings" },
 ];

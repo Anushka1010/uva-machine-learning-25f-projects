@@ -232,13 +232,45 @@ export function api_getItem(itemId: string) {
 }
 
 export function api_listItems(status?: string) {
-  loadDb();
-  return Promise.resolve(status ? items.filter((i) => i.status === status) : [...items]);
+  const FLASK_API_URL = "http://127.0.0.1:5000";
+  console.log('Fetching items from backend');
+  return fetch(`${FLASK_API_URL}/api/inventory`)
+    .then((res) => {
+      console.log('Fetch response:', res);
+      return res.json();
+    })
+    .then((data) => {
+      console.log('Fetched data:', data);
+      // Transform backend data to match frontend types
+      const transformed = data.map((item: any) => ({
+        id: item._id,
+        label: item.name,
+        category: "food", // or map from name
+        expiresAt: item.expiration_date,
+        status: item.status,
+        imageUrl: item.image?.url,
+        datePlaced: item.date_placed,
+      }));
+      console.log('Transformed:', transformed);
+      // Filter by status if provided
+      const filtered = status ? transformed.filter((i) => i.status === status) : transformed;
+      console.log('Filtered:', filtered);
+      return filtered;
+    })
+    .catch((error) => {
+      console.error("Failed to fetch inventory:", error);
+      return [];
+    });
 }
 
 export function api_listEvents() {
-  loadDb();
-  return Promise.resolve([...events].sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1)));
+  const FLASK_API_URL = "http://127.0.0.1:5000";
+  return fetch(`${FLASK_API_URL}/api/events`)
+    .then((res) => res.json())
+    .catch((error) => {
+      console.error("Failed to fetch events:", error);
+      return [];
+    });
 }
 
 export function api_getExpiryDefaults() {
@@ -344,46 +376,13 @@ export function api_scanOut(file: { name: string; imageUrl?: string }) {
 }
 
 export function api_alerts() {
-  loadDb();
-
-  const now = new Date();
-  const out: Array<{ type: string; message: string; itemId: string }> = [];
-
-  for (const it of items) {
-    if (it.status !== "in_fridge" || !it.expiresAt) continue;
-
-    const created = new Date(it.createdAt);
-    const expires = new Date(it.expiresAt);
-
-    const total = expires.getTime() - created.getTime();
-    const used = now.getTime() - created.getTime();
-    const pct = total > 0 ? used / total : 0;
-    const daysLeft = (expires.getTime() - now.getTime()) / 86400000;
-
-    if (pct >= 0.66 && pct <= 0.75) {
-      out.push({
-        type: "shelf_life",
-        message: `${it.label} is ~${Math.round(pct * 100)}% through shelf life`,
-        itemId: it.id,
-      });
-    }
-    if (daysLeft >= 0 && daysLeft <= 1.1) {
-      out.push({
-        type: "one_day",
-        message: `${it.label} expires in ~1 day`,
-        itemId: it.id,
-      });
-    }
-    if (daysLeft < 0) {
-      out.push({
-        type: "expired",
-        message: `${it.label} has expired`,
-        itemId: it.id,
-      });
-    }
-  }
-
-  return Promise.resolve(out);
+  const FLASK_API_URL = "http://127.0.0.1:5000";
+  return fetch(`${FLASK_API_URL}/api/alerts`)
+    .then((res) => res.json())
+    .catch((error) => {
+      console.error("Failed to fetch alerts:", error);
+      return [];
+    });
 }
 
 export function api_relatedRecipesForItem(label: string) {
@@ -411,56 +410,69 @@ export function api_recommendations(payload: {
   minCoverage: number;
   prioritizeExpiring: boolean;
 }) {
-  loadDb();
+  const FLASK_API_URL = "http://127.0.0.1:5000";
+  return fetch(`${FLASK_API_URL}/api/inventory`)
+    .then((res) => res.json())
+    .then((data) => {
+      // Transform to match mock Item format
+      const inv = data
+        .filter((item: any) => item.status === "in_fridge")
+        .map((item: any) => ({
+          id: item._id,
+          label: item.name,
+          category: "food",
+          expiresAt: item.expiration_date,
+          status: item.status,
+        }));
 
-  const inv = items.filter((i) => i.status === "in_fridge");
-  const invBy = new Map(inv.map((i) => [i.label, i]));
-  const now = new Date();
+      const invBy = new Map(inv.map((i) => [i.label, i]));
+      const now = new Date();
 
-  const scored: RecipeRecommendation[] = recipes.map((r) => {
-    const have: string[] = [];
-    const missing: string[] = [];
-    let expBonus = 0;
+      const scored: RecipeRecommendation[] = recipes.map((r) => {
+        const have: string[] = [];
+        const missing: string[] = [];
+        let expBonus = 0;
 
-    for (const ing of r.ingredients) {
-      const it = invBy.get(ing);
-      if (it) {
-        have.push(ing);
-        if (payload.prioritizeExpiring && it.expiresAt) {
-          const daysLeft = (new Date(it.expiresAt).getTime() - now.getTime()) / 86400000;
-          if (daysLeft <= 2) expBonus += 3;
-          else if (daysLeft <= 5) expBonus += 2;
-          else expBonus += 1;
+        for (const ing of r.ingredients) {
+          const it = invBy.get(ing);
+          if (it) {
+            have.push(ing);
+            if (payload.prioritizeExpiring && it.expiresAt) {
+              const daysLeft = (new Date(it.expiresAt).getTime() - now.getTime()) / 86400000;
+              if (daysLeft <= 2) expBonus += 3;
+              else if (daysLeft <= 5) expBonus += 2;
+              else expBonus += 1;
+            }
+          } else {
+            missing.push(ing);
+          }
         }
-      } else {
-        missing.push(ing);
-      }
-    }
 
-    const coverage = have.length / Math.max(1, r.ingredients.length);
-    const base = coverage * 10 + expBonus - missing.length * 1.5;
+        const coverage = have.length / Math.max(1, r.ingredients.length);
+        const base = coverage * 10 + expBonus - missing.length * 1.5;
 
-    const md = macroDistance(r.macros, payload.target);
-    const score = base - 0.02 * md;
+        const md = macroDistance(r.macros, payload.target);
+        const score = base - 0.02 * md;
 
-    return {
-      recipe: r,
-      score: Number(score.toFixed(2)),
-      coverage,
-      have,
-      missing,
-      reasons: [
-        `Have ${have.length}/${r.ingredients.length} ingredients`,
-        payload.prioritizeExpiring ? "Prioritizes expiring items" : "Expiration not prioritized",
-      ],
-    };
-  });
+        return {
+          recipe: r,
+          score: Number(score.toFixed(2)),
+          coverage,
+          have,
+          missing,
+          reasons: coverage >= payload.minCoverage ? ["Good coverage"] : ["Low coverage"],
+        };
+      });
 
-  return Promise.resolve(
-    scored
-      .filter((x) => x.coverage >= payload.minCoverage)
-      .sort((a, b) => b.score - a.score)
-  );
+      return scored
+        .filter((r) => r.coverage >= payload.minCoverage)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10);
+    })
+    .catch((error) => {
+      console.error("Failed to fetch recommendations:", error);
+      return [];
+    });
 }
 
 export function api_listRecipes() {
