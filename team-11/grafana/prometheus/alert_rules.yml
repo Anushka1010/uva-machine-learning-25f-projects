@@ -1,0 +1,202 @@
+groups:
+  - name: credit_model_performance
+    interval: 30s
+    rules:
+      - alert: HighPredictionErrorRate
+        expr: rate(prediction_errors_total[5m]) > 0.01
+        for: 5m
+        labels:
+          severity: warning
+          component: model
+        annotations:
+          summary: "High prediction error rate detected"
+          description: "Prediction error rate is {{ $value | humanize }} errors/sec (threshold: 0.01/sec)"
+          dashboard: "http://grafana:3000/d/model-performance"
+
+      - alert: HighPredictionLatency
+        expr: histogram_quantile(0.95, rate(prediction_latency_seconds_bucket[5m])) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High prediction latency (p95)"
+          description: "95th percentile latency is {{ $value | humanize }}s (threshold: 0.5s)"
+          dashboard: "http://grafana:3000/d/model-performance"
+
+      - alert: VeryHighPredictionLatency
+        expr: histogram_quantile(0.99, rate(prediction_latency_seconds_bucket[5m])) > 1.0
+        for: 3m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "Very high prediction latency (p99)"
+          description: "99th percentile latency is {{ $value | humanize }}s (threshold: 1.0s)"
+          dashboard: "http://grafana:3000/d/model-performance"
+
+  - name: credit_model_calibration
+    interval: 1m
+    rules:
+      - alert: PoorModelCalibration
+        expr: model_calibration_brier_score > 0.20
+        for: 10m
+        labels:
+          severity: critical
+          component: model
+        annotations:
+          summary: "Model calibration has degraded"
+          description: "Brier score is {{ $value | humanize }}, should be < 0.20. Consider recalibrating the model."
+          remediation: "Run: python -m src.main calibrate --model-path models/credit_model.pkl --data-path data/recent_data.csv"
+          dashboard: "http://grafana:3000/d/calibration"
+
+      - alert: AcceptableCalibrationDrift
+        expr: model_calibration_brier_score > 0.15
+        for: 15m
+        labels:
+          severity: warning
+          component: model
+        annotations:
+          summary: "Model calibration is degrading"
+          description: "Brier score is {{ $value | humanize }}, approaching threshold of 0.20"
+          dashboard: "http://grafana:3000/d/calibration"
+
+      - alert: HighCVScoreVariance
+        expr: model_cv_score_std > 0.05
+        for: 10m
+        labels:
+          severity: warning
+          component: model
+        annotations:
+          summary: "High cross-validation score variance"
+          description: "CV std dev is {{ $value | humanize }}, indicating inconsistent performance"
+          dashboard: "http://grafana:3000/d/calibration"
+
+  - name: credit_fairness
+    interval: 1m
+    rules:
+      - alert: DisparateImpactViolation
+        expr: fairness_disparate_impact < 0.80
+        for: 15m
+        labels:
+          severity: critical
+          component: fairness
+          compliance: four_fifths_rule
+        annotations:
+          summary: "Disparate impact below legal threshold"
+          description: "Disparate impact ratio is {{ $value | humanize }}, must be >= 0.80 (Four-Fifths Rule)"
+          remediation: "Review fairness thresholds and reweighting. Consider adjusting group-specific thresholds."
+          dashboard: "http://grafana:3000/d/fairness"
+
+      - alert: DisparateImpactWarning
+        expr: fairness_disparate_impact < 0.85 and fairness_disparate_impact >= 0.80
+        for: 20m
+        labels:
+          severity: warning
+          component: fairness
+        annotations:
+          summary: "Disparate impact approaching threshold"
+          description: "Disparate impact ratio is {{ $value | humanize }}, close to minimum of 0.80"
+          dashboard: "http://grafana:3000/d/fairness"
+
+      - alert: StatisticalParityViolation
+        expr: abs(fairness_statistical_parity_diff) > 0.05
+        for: 15m
+        labels:
+          severity: warning
+          component: fairness
+        annotations:
+          summary: "Statistical parity difference exceeds target"
+          description: "Statistical parity difference is {{ $value | humanize }}, target is < 0.05"
+          dashboard: "http://grafana:3000/d/fairness"
+
+      - alert: EqualizedOddsViolation
+        expr: abs(fairness_equalized_odds_diff) > 0.10
+        for: 15m
+        labels:
+          severity: warning
+          component: fairness
+        annotations:
+          summary: "Equalized odds difference exceeds target"
+          description: "Equalized odds difference is {{ $value | humanize }}, target is < 0.10"
+          dashboard: "http://grafana:3000/d/fairness"
+
+  - name: credit_data_quality
+    interval: 30s
+    rules:
+      - alert: DataQualityDegradation
+        expr: data_quality_score < 60
+        for: 10m
+        labels:
+          severity: warning
+          component: data
+        annotations:
+          summary: "Data quality score is low"
+          description: "Data quality score is {{ $value | humanize }}/100, indicating significant issues"
+          dashboard: "http://grafana:3000/d/data-quality"
+
+      - alert: CriticalDataQuality
+        expr: data_quality_score < 40
+        for: 5m
+        labels:
+          severity: critical
+          component: data
+        annotations:
+          summary: "Critical data quality issues"
+          description: "Data quality score is {{ $value | humanize }}/100, prediction reliability may be compromised"
+          dashboard: "http://grafana:3000/d/data-quality"
+
+      - alert: HighValidationIssueRate
+        expr: rate(data_quality_validation_issues_total[5m]) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+          component: data
+        annotations:
+          summary: "High rate of data validation issues"
+          description: "Validation issues occurring at {{ $value | humanize }}/sec"
+          dashboard: "http://grafana:3000/d/data-quality"
+
+      - alert: UnseenCategoriesDetected
+        expr: rate(data_quality_unseen_categories_total[5m]) > 0.1
+        for: 10m
+        labels:
+          severity: info
+          component: data
+        annotations:
+          summary: "Unseen categorical values detected"
+          description: "New categorical values appearing at {{ $value | humanize }}/sec, may indicate data drift"
+          dashboard: "http://grafana:3000/d/data-quality"
+
+  - name: credit_api_health
+    interval: 30s
+    rules:
+      - alert: APIDown
+        expr: up{job="credit-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "Credit API is down"
+          description: "The credit prediction API has been down for more than 1 minute"
+
+      - alert: HighAuthFailureRate
+        expr: rate(api_auth_failures_total[5m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "High API authentication failure rate"
+          description: "Auth failures occurring at {{ $value | humanize }}/sec, possible attack"
+
+      - alert: ModelNotLoaded
+        expr: up{job="credit-api"} == 1 and absent(model_is_calibrated)
+        for: 2m
+        labels:
+          severity: critical
+          component: model
+        annotations:
+          summary: "Model not loaded in API"
+          description: "API is running but model metrics are not being reported"

@@ -1,0 +1,1432 @@
+2025-12-08 16:18:24,858 - credit_prediction - INFO - ============================================================
+2025-12-08 16:18:24,858 - credit_prediction - INFO - Fair Credit Score Prediction Pipeline
+2025-12-08 16:18:24,858 - credit_prediction - INFO - ============================================================
+2025-12-08 16:18:24,858 - credit_prediction.utils - INFO - Random seed set to 42
+2025-12-08 16:18:24,858 - credit_prediction - INFO - 
+[STEP 1] Loading and validating data...
+2025-12-08 16:18:24,858 - credit_prediction.data_loader - INFO - Loading data from data/sample_credit_data.csv
+2025-12-08 16:18:24,861 - credit_prediction.data_loader - INFO - Loaded 1000 rows, 13 columns
+2025-12-08 16:18:24,864 - credit_prediction.data_loader - INFO - Validation passed with no issues
+2025-12-08 16:18:24,865 - credit_prediction - INFO - 
+[STEP 2] Preprocessing data...
+2025-12-08 16:18:24,870 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 16:18:24,873 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 16:18:24,873 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 16:18:24,876 - credit_prediction.preprocessing - INFO - CDI calculated: 506/1000 (50.6%) classified as disadvantaged (threshold >= 2)
+2025-12-08 16:18:24,888 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 13 dummy variables
+2025-12-08 16:18:24,889 - credit_prediction.preprocessing - INFO - Prepared features: 21 features, 1000 samples
+2025-12-08 16:18:24,891 - credit_prediction.preprocessing - INFO - Split data: 800 train, 200 test (test_size=0.2, seed=42)
+2025-12-08 16:18:24,894 - credit_prediction - INFO - Training set: 800 samples
+2025-12-08 16:18:24,894 - credit_prediction - INFO - Test set: 200 samples
+2025-12-08 16:18:24,894 - credit_prediction - INFO - 
+[STEP 3] Applying fairness pre-processing...
+2025-12-08 16:18:24,901 - credit_prediction.fairness - INFO - Reweighing applied: weights range [0.964, 1.039]
+2025-12-08 16:18:24,901 - credit_prediction - INFO - Reweighing applied to training data
+2025-12-08 16:18:24,901 - credit_prediction - INFO - 
+[STEP 4] Training model...
+2025-12-08 16:18:24,902 - credit_prediction.model - INFO - Dropped protected attribute 'Proxy_Disadvantaged' from training
+2025-12-08 16:18:24,902 - credit_prediction.model - INFO - Training XGBoost classifier...
+2025-12-08 16:18:25,074 - credit_prediction.model - INFO - Model trained on 800 samples, 21 features
+2025-12-08 16:18:25,074 - credit_prediction - INFO - 
+[STEP 5] Generating predictions and evaluating...
+2025-12-08 16:18:25,083 - credit_prediction.model - INFO - Evaluation metrics:
+2025-12-08 16:18:25,083 - credit_prediction.model - INFO -   accuracy: 0.5650
+2025-12-08 16:18:25,083 - credit_prediction.model - INFO -   precision: 0.6641
+2025-12-08 16:18:25,083 - credit_prediction.model - INFO -   recall: 0.6589
+2025-12-08 16:18:25,083 - credit_prediction.model - INFO -   f1: 0.6615
+2025-12-08 16:18:25,084 - credit_prediction.model - INFO -   roc_auc: 0.5515
+2025-12-08 16:18:25,084 - credit_prediction - INFO - 
+[STEP 6] Applying fairness post-processing...
+2025-12-08 16:18:25,084 - credit_prediction.fairness - INFO - Threshold adjustment applied: privileged=0.5, unprivileged=0.4
+2025-12-08 16:18:25,084 - credit_prediction - INFO - 
+[STEP 7] Calculating fairness metrics...
+2025-12-08 16:18:25,086 - credit_prediction.fairness - INFO - 
+============================================================
+2025-12-08 16:18:25,086 - credit_prediction.fairness - INFO - Fairness Metrics (Before Adjustment)
+2025-12-08 16:18:25,086 - credit_prediction.fairness - INFO - ============================================================
+2025-12-08 16:18:25,086 - credit_prediction.fairness - INFO - Disparate Impact Ratio: 1.1270 (target >= 0.8) [✓ PASS]
+2025-12-08 16:18:25,086 - credit_prediction.fairness - INFO - Statistical Parity Diff: 0.0762 (target < 0.05) [✗ FAIL]
+2025-12-08 16:18:25,086 - credit_prediction.fairness - INFO - Equalized Odds Diff: 0.2143 (target < 0.1) [✗ FAIL]
+2025-12-08 16:18:25,086 - credit_prediction.fairness - INFO - 
+Group Metrics:
+2025-12-08 16:18:25,086 - credit_prediction.fairness - INFO -   Privileged accuracy: 0.6000, positive rate: 0.6000
+2025-12-08 16:18:25,086 - credit_prediction.fairness - INFO -   Unprivileged accuracy: 0.5333, positive rate: 0.6762
+2025-12-08 16:18:25,086 - credit_prediction.fairness - INFO - ============================================================
+
+2025-12-08 16:18:25,088 - credit_prediction.fairness - INFO - 
+============================================================
+2025-12-08 16:18:25,088 - credit_prediction.fairness - INFO - Fairness Metrics (After Adjustment)
+2025-12-08 16:18:25,088 - credit_prediction.fairness - INFO - ============================================================
+2025-12-08 16:18:25,088 - credit_prediction.fairness - INFO - Disparate Impact Ratio: 1.2222 (target >= 0.8) [✓ PASS]
+2025-12-08 16:18:25,088 - credit_prediction.fairness - INFO - Statistical Parity Diff: 0.1333 (target < 0.05) [✗ FAIL]
+2025-12-08 16:18:25,088 - credit_prediction.fairness - INFO - Equalized Odds Diff: 0.2429 (target < 0.1) [✗ FAIL]
+2025-12-08 16:18:25,088 - credit_prediction.fairness - INFO - 
+Group Metrics:
+2025-12-08 16:18:25,088 - credit_prediction.fairness - INFO -   Privileged accuracy: 0.6000, positive rate: 0.6000
+2025-12-08 16:18:25,089 - credit_prediction.fairness - INFO -   Unprivileged accuracy: 0.5714, positive rate: 0.7333
+2025-12-08 16:18:25,089 - credit_prediction.fairness - INFO - ============================================================
+
+2025-12-08 16:18:25,089 - credit_prediction - WARNING - ✗ Some fairness targets not met: ['statistical_parity_difference', 'equalized_odds_difference']
+2025-12-08 16:18:25,089 - credit_prediction - INFO - 
+[STEP 8] Generating explanations...
+2025-12-08 16:18:25,098 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-08 16:18:25,108 - credit_prediction.explainability - INFO - SHAP values calculated for 200 samples
+2025-12-08 16:18:26,466 - credit_prediction.explainability - INFO - Global feature importance plot saved to reports/figures/feature_importance_shap.png
+2025-12-08 16:18:26,615 - credit_prediction.explainability - INFO - Detailed SHAP plot saved to reports/figures/feature_importance_detailed.png
+2025-12-08 16:18:26,616 - credit_prediction.utils - INFO - Random seed set to 42
+2025-12-08 16:18:26,624 - credit_prediction.explainability - INFO - SHAP values calculated for 200 samples
+2025-12-08 16:18:26,627 - credit_prediction.explainability - INFO - Generated 5 explanations in explanations
+2025-12-08 16:18:26,627 - credit_prediction - INFO - 
+[STEP 9] Saving artifacts...
+2025-12-08 16:18:26,628 - credit_prediction.model - INFO - Model saved to models/credit_model.pkl
+2025-12-08 16:20:35,910 - credit_prediction - INFO - ============================================================
+2025-12-08 16:20:35,910 - credit_prediction - INFO - Fair Credit Score Prediction Pipeline
+2025-12-08 16:20:35,910 - credit_prediction - INFO - ============================================================
+2025-12-08 16:20:35,910 - credit_prediction.utils - INFO - Random seed set to 42
+2025-12-08 16:20:35,910 - credit_prediction - INFO - 
+[STEP 1] Loading and validating data...
+2025-12-08 16:20:35,910 - credit_prediction.data_loader - INFO - Loading data from data/sample_credit_data.csv
+2025-12-08 16:20:35,914 - credit_prediction.data_loader - INFO - Loaded 1000 rows, 13 columns
+2025-12-08 16:20:35,918 - credit_prediction.data_loader - INFO - Validation passed with no issues
+2025-12-08 16:20:35,918 - credit_prediction - INFO - 
+[STEP 2] Preprocessing data...
+2025-12-08 16:20:35,920 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 16:20:35,920 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 16:20:35,921 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 16:20:35,922 - credit_prediction.preprocessing - INFO - CDI calculated: 506/1000 (50.6%) classified as disadvantaged (threshold >= 2)
+2025-12-08 16:20:35,924 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 13 dummy variables
+2025-12-08 16:20:35,925 - credit_prediction.preprocessing - INFO - Prepared features: 21 features, 1000 samples
+2025-12-08 16:20:35,927 - credit_prediction.preprocessing - INFO - Split data: 800 train, 200 test (test_size=0.2, seed=42)
+2025-12-08 16:20:35,929 - credit_prediction - INFO - Training set: 800 samples
+2025-12-08 16:20:35,929 - credit_prediction - INFO - Test set: 200 samples
+2025-12-08 16:20:35,929 - credit_prediction - INFO - 
+[STEP 3] Applying fairness pre-processing...
+2025-12-08 16:20:35,930 - credit_prediction.fairness - INFO - Reweighing applied: weights range [0.964, 1.039]
+2025-12-08 16:20:35,931 - credit_prediction - INFO - Reweighing applied to training data
+2025-12-08 16:20:35,931 - credit_prediction - INFO - 
+[STEP 4] Training model...
+2025-12-08 16:20:35,931 - credit_prediction.model - INFO - Dropped protected attribute 'Proxy_Disadvantaged' from training
+2025-12-08 16:20:35,931 - credit_prediction.model - INFO - Training XGBoost classifier...
+2025-12-08 16:20:36,116 - credit_prediction.model - INFO - Model trained on 800 samples, 21 features
+2025-12-08 16:20:36,116 - credit_prediction - INFO - 
+[STEP 5] Generating predictions and evaluating...
+2025-12-08 16:20:36,125 - credit_prediction.model - INFO - Evaluation metrics:
+2025-12-08 16:20:36,125 - credit_prediction.model - INFO -   accuracy: 0.5650
+2025-12-08 16:20:36,125 - credit_prediction.model - INFO -   precision: 0.6641
+2025-12-08 16:20:36,125 - credit_prediction.model - INFO -   recall: 0.6589
+2025-12-08 16:20:36,125 - credit_prediction.model - INFO -   f1: 0.6615
+2025-12-08 16:20:36,125 - credit_prediction.model - INFO -   roc_auc: 0.5515
+2025-12-08 16:20:36,126 - credit_prediction - INFO - 
+[STEP 6] Applying fairness post-processing...
+2025-12-08 16:20:36,126 - credit_prediction.fairness - INFO - Threshold adjustment applied: privileged=0.5, unprivileged=0.4
+2025-12-08 16:20:36,126 - credit_prediction - INFO - 
+[STEP 7] Calculating fairness metrics...
+2025-12-08 16:20:36,128 - credit_prediction.fairness - INFO - 
+============================================================
+2025-12-08 16:20:36,128 - credit_prediction.fairness - INFO - Fairness Metrics (Before Adjustment)
+2025-12-08 16:20:36,128 - credit_prediction.fairness - INFO - ============================================================
+2025-12-08 16:20:36,128 - credit_prediction.fairness - INFO - Disparate Impact Ratio: 1.1270 (target >= 0.8) [✓ PASS]
+2025-12-08 16:20:36,128 - credit_prediction.fairness - INFO - Statistical Parity Diff: 0.0762 (target < 0.05) [✗ FAIL]
+2025-12-08 16:20:36,128 - credit_prediction.fairness - INFO - Equalized Odds Diff: 0.2143 (target < 0.1) [✗ FAIL]
+2025-12-08 16:20:36,128 - credit_prediction.fairness - INFO - 
+Group Metrics:
+2025-12-08 16:20:36,128 - credit_prediction.fairness - INFO -   Privileged accuracy: 0.6000, positive rate: 0.6000
+2025-12-08 16:20:36,128 - credit_prediction.fairness - INFO -   Unprivileged accuracy: 0.5333, positive rate: 0.6762
+2025-12-08 16:20:36,128 - credit_prediction.fairness - INFO - ============================================================
+
+2025-12-08 16:20:36,130 - credit_prediction.fairness - INFO - 
+============================================================
+2025-12-08 16:20:36,130 - credit_prediction.fairness - INFO - Fairness Metrics (After Adjustment)
+2025-12-08 16:20:36,130 - credit_prediction.fairness - INFO - ============================================================
+2025-12-08 16:20:36,130 - credit_prediction.fairness - INFO - Disparate Impact Ratio: 1.2222 (target >= 0.8) [✓ PASS]
+2025-12-08 16:20:36,130 - credit_prediction.fairness - INFO - Statistical Parity Diff: 0.1333 (target < 0.05) [✗ FAIL]
+2025-12-08 16:20:36,130 - credit_prediction.fairness - INFO - Equalized Odds Diff: 0.2429 (target < 0.1) [✗ FAIL]
+2025-12-08 16:20:36,130 - credit_prediction.fairness - INFO - 
+Group Metrics:
+2025-12-08 16:20:36,130 - credit_prediction.fairness - INFO -   Privileged accuracy: 0.6000, positive rate: 0.6000
+2025-12-08 16:20:36,130 - credit_prediction.fairness - INFO -   Unprivileged accuracy: 0.5714, positive rate: 0.7333
+2025-12-08 16:20:36,130 - credit_prediction.fairness - INFO - ============================================================
+
+2025-12-08 16:20:36,130 - credit_prediction - WARNING - ✗ Some fairness targets not met: ['statistical_parity_difference', 'equalized_odds_difference']
+2025-12-08 16:20:36,130 - credit_prediction - INFO - 
+[STEP 8] Generating explanations...
+2025-12-08 16:20:36,136 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-08 16:20:36,147 - credit_prediction.explainability - INFO - SHAP values calculated for 200 samples
+2025-12-08 16:20:36,381 - credit_prediction.explainability - INFO - Global feature importance plot saved to reports/figures/feature_importance_shap.png
+2025-12-08 16:20:36,551 - credit_prediction.explainability - INFO - Detailed SHAP plot saved to reports/figures/feature_importance_detailed.png
+2025-12-08 16:20:36,551 - credit_prediction.utils - INFO - Random seed set to 42
+2025-12-08 16:20:36,561 - credit_prediction.explainability - INFO - SHAP values calculated for 200 samples
+2025-12-08 16:20:36,563 - credit_prediction.explainability - INFO - Generated 5 explanations in explanations
+2025-12-08 16:20:36,563 - credit_prediction - INFO - 
+[STEP 9] Saving artifacts...
+2025-12-08 16:20:36,564 - credit_prediction.model - INFO - Model saved to models/credit_model.pkl
+2025-12-08 16:20:36,564 - credit_prediction - INFO - Metrics saved to outputs/metrics.json
+2025-12-08 16:20:36,564 - credit_prediction - INFO - 
+============================================================
+2025-12-08 16:20:36,564 - credit_prediction - INFO - PIPELINE COMPLETE
+2025-12-08 16:20:36,564 - credit_prediction - INFO - ============================================================
+2025-12-08 16:20:36,564 - credit_prediction - INFO - Model Accuracy: 0.5650
+2025-12-08 16:20:36,564 - credit_prediction - INFO - Disparate Impact: 1.2222
+2025-12-08 16:20:36,564 - credit_prediction - INFO - Statistical Parity Diff: 0.1333
+2025-12-08 16:20:36,564 - credit_prediction - INFO - Equalized Odds Diff: 0.2429
+2025-12-08 16:20:36,564 - credit_prediction - INFO - Explanations generated: 5
+2025-12-08 16:20:36,564 - credit_prediction - INFO - ============================================================
+
+2025-12-08 16:24:19,774 - credit_prediction - INFO - ============================================================
+2025-12-08 16:24:19,775 - credit_prediction - INFO - Fair Credit Score Prediction Pipeline
+2025-12-08 16:24:19,775 - credit_prediction - INFO - ============================================================
+2025-12-08 16:24:19,775 - credit_prediction.utils - INFO - Random seed set to 42
+2025-12-08 16:24:19,775 - credit_prediction - INFO - 
+[STEP 1] Loading and validating data...
+2025-12-08 16:24:19,775 - credit_prediction.data_loader - INFO - Loading data from data/sample_credit_data.csv
+2025-12-08 16:24:19,779 - credit_prediction.data_loader - INFO - Loaded 1000 rows, 13 columns
+2025-12-08 16:24:19,784 - credit_prediction.data_loader - INFO - Validation passed with no issues
+2025-12-08 16:24:19,784 - credit_prediction - INFO - 
+[STEP 2] Preprocessing data...
+2025-12-08 16:24:19,787 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 16:24:19,787 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 16:24:19,788 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 16:24:19,789 - credit_prediction.preprocessing - INFO - CDI calculated: 506/1000 (50.6%) classified as disadvantaged (threshold >= 2)
+2025-12-08 16:24:19,791 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 13 dummy variables
+2025-12-08 16:24:19,792 - credit_prediction.preprocessing - INFO - Prepared features: 21 features, 1000 samples
+2025-12-08 16:24:19,794 - credit_prediction.preprocessing - INFO - Split data: 800 train, 200 test (test_size=0.2, seed=42)
+2025-12-08 16:24:19,795 - credit_prediction - INFO - Training set: 800 samples
+2025-12-08 16:24:19,795 - credit_prediction - INFO - Test set: 200 samples
+2025-12-08 16:24:19,795 - credit_prediction - INFO - 
+[STEP 3] Applying fairness pre-processing...
+2025-12-08 16:24:19,798 - credit_prediction.fairness - INFO - Reweighing applied: weights range [0.964, 1.039]
+2025-12-08 16:24:19,798 - credit_prediction - INFO - Reweighing applied to training data
+2025-12-08 16:24:19,798 - credit_prediction - INFO - 
+[STEP 4] Training model...
+2025-12-08 16:24:19,799 - credit_prediction.model - INFO - Dropped protected attribute 'Proxy_Disadvantaged' from training
+2025-12-08 16:24:19,799 - credit_prediction.model - INFO - Training XGBoost classifier...
+2025-12-08 16:24:19,986 - credit_prediction.model - INFO - Model trained on 800 samples, 21 features
+2025-12-08 16:24:19,986 - credit_prediction - INFO - 
+[STEP 5] Generating predictions and evaluating...
+2025-12-08 16:24:19,997 - credit_prediction.model - INFO - Evaluation metrics:
+2025-12-08 16:24:19,998 - credit_prediction.model - INFO -   accuracy: 0.5650
+2025-12-08 16:24:19,998 - credit_prediction.model - INFO -   precision: 0.6641
+2025-12-08 16:24:19,998 - credit_prediction.model - INFO -   recall: 0.6589
+2025-12-08 16:24:19,998 - credit_prediction.model - INFO -   f1: 0.6615
+2025-12-08 16:24:19,998 - credit_prediction.model - INFO -   roc_auc: 0.5515
+2025-12-08 16:24:19,998 - credit_prediction - INFO - 
+[STEP 6] Applying fairness post-processing...
+2025-12-08 16:24:19,998 - credit_prediction.fairness - INFO - Threshold adjustment applied: privileged=0.5, unprivileged=0.4
+2025-12-08 16:24:19,998 - credit_prediction - INFO - 
+[STEP 7] Calculating fairness metrics...
+2025-12-08 16:24:20,001 - credit_prediction.fairness - INFO - 
+============================================================
+2025-12-08 16:24:20,001 - credit_prediction.fairness - INFO - Fairness Metrics (Before Adjustment)
+2025-12-08 16:24:20,001 - credit_prediction.fairness - INFO - ============================================================
+2025-12-08 16:24:20,001 - credit_prediction.fairness - INFO - Disparate Impact Ratio: 1.1270 (target >= 0.8) [✓ PASS]
+2025-12-08 16:24:20,001 - credit_prediction.fairness - INFO - Statistical Parity Diff: 0.0762 (target < 0.05) [✗ FAIL]
+2025-12-08 16:24:20,001 - credit_prediction.fairness - INFO - Equalized Odds Diff: 0.2143 (target < 0.1) [✗ FAIL]
+2025-12-08 16:24:20,001 - credit_prediction.fairness - INFO - 
+Group Metrics:
+2025-12-08 16:24:20,001 - credit_prediction.fairness - INFO -   Privileged accuracy: 0.6000, positive rate: 0.6000
+2025-12-08 16:24:20,001 - credit_prediction.fairness - INFO -   Unprivileged accuracy: 0.5333, positive rate: 0.6762
+2025-12-08 16:24:20,001 - credit_prediction.fairness - INFO - ============================================================
+
+2025-12-08 16:24:20,004 - credit_prediction.fairness - INFO - 
+============================================================
+2025-12-08 16:24:20,004 - credit_prediction.fairness - INFO - Fairness Metrics (After Adjustment)
+2025-12-08 16:24:20,004 - credit_prediction.fairness - INFO - ============================================================
+2025-12-08 16:24:20,004 - credit_prediction.fairness - INFO - Disparate Impact Ratio: 1.2222 (target >= 0.8) [✓ PASS]
+2025-12-08 16:24:20,004 - credit_prediction.fairness - INFO - Statistical Parity Diff: 0.1333 (target < 0.05) [✗ FAIL]
+2025-12-08 16:24:20,004 - credit_prediction.fairness - INFO - Equalized Odds Diff: 0.2429 (target < 0.1) [✗ FAIL]
+2025-12-08 16:24:20,004 - credit_prediction.fairness - INFO - 
+Group Metrics:
+2025-12-08 16:24:20,004 - credit_prediction.fairness - INFO -   Privileged accuracy: 0.6000, positive rate: 0.6000
+2025-12-08 16:24:20,005 - credit_prediction.fairness - INFO -   Unprivileged accuracy: 0.5714, positive rate: 0.7333
+2025-12-08 16:24:20,005 - credit_prediction.fairness - INFO - ============================================================
+
+2025-12-08 16:24:20,005 - credit_prediction - WARNING - ✗ Some fairness targets not met: ['statistical_parity_difference', 'equalized_odds_difference']
+2025-12-08 16:24:20,005 - credit_prediction - INFO - 
+[STEP 8] Generating explanations...
+2025-12-08 16:24:20,041 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-08 16:24:20,053 - credit_prediction.explainability - INFO - SHAP values calculated for 200 samples
+2025-12-08 16:24:20,302 - credit_prediction.explainability - INFO - Global feature importance plot saved to reports/figures/feature_importance_shap.png
+2025-12-08 16:24:20,478 - credit_prediction.explainability - INFO - Detailed SHAP plot saved to reports/figures/feature_importance_detailed.png
+2025-12-08 16:24:20,478 - credit_prediction.utils - INFO - Random seed set to 42
+2025-12-08 16:24:20,486 - credit_prediction.explainability - INFO - SHAP values calculated for 200 samples
+2025-12-08 16:24:20,489 - credit_prediction.explainability - INFO - Generated 5 explanations in explanations
+2025-12-08 16:24:20,489 - credit_prediction - INFO - 
+[STEP 9] Saving artifacts...
+2025-12-08 16:24:20,490 - credit_prediction.model - INFO - Model saved to models/credit_model.pkl
+2025-12-08 16:24:20,490 - credit_prediction - INFO - Metrics saved to outputs/metrics.json
+2025-12-08 16:24:20,490 - credit_prediction - INFO - 
+============================================================
+2025-12-08 16:24:20,490 - credit_prediction - INFO - PIPELINE COMPLETE
+2025-12-08 16:24:20,490 - credit_prediction - INFO - ============================================================
+2025-12-08 16:24:20,490 - credit_prediction - INFO - Model Accuracy: 0.5650
+2025-12-08 16:24:20,490 - credit_prediction - INFO - Disparate Impact: 1.2222
+2025-12-08 16:24:20,490 - credit_prediction - INFO - Statistical Parity Diff: 0.1333
+2025-12-08 16:24:20,490 - credit_prediction - INFO - Equalized Odds Diff: 0.2429
+2025-12-08 16:24:20,490 - credit_prediction - INFO - Explanations generated: 5
+2025-12-08 16:24:20,490 - credit_prediction - INFO - ============================================================
+
+2025-12-08 16:27:22,332 - credit_prediction.model - INFO - Model loaded from models/credit_model.pkl
+2025-12-08 16:27:22,346 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-08 16:27:22,346 - credit_prediction - INFO - Model loaded from models/credit_model.pkl
+2025-12-08 16:27:56,023 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 16:27:56,024 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 16:27:56,025 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 16:27:56,026 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-08 16:27:56,031 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 0 dummy variables
+2025-12-08 16:27:56,032 - credit_prediction - ERROR - Prediction error: feature_names mismatch: ['Income', 'Debt', 'Loan_Amount', 'Loan_Term', 'Num_Credit_Cards', 'Debt_to_Income', 'Loan_to_Income', 'CDI', 'Gender_Male', 'Education_High School', "Education_Master's", 'Education_PhD', 'Payment_History_Fair', 'Payment_History_Good', 'Payment_History_Poor', 'Employment_Status_Self-Employed', 'Employment_Status_Unemployed', 'Residence_Type_Owned', 'Residence_Type_Rented', 'Marital_Status_Married', 'Marital_Status_Single'] ['Income', 'Debt', 'Loan_Amount', 'Loan_Term', 'Num_Credit_Cards', 'Debt_to_Income', 'Loan_to_Income', 'CDI']
+expected Payment_History_Fair, Education_Master's, Education_High School, Payment_History_Poor, Employment_Status_Unemployed, Employment_Status_Self-Employed, Education_PhD, Residence_Type_Rented, Marital_Status_Married, Marital_Status_Single, Gender_Male, Payment_History_Good, Residence_Type_Owned in input data
+2025-12-08 16:28:05,819 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 16:28:05,819 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 16:28:05,820 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 16:28:05,821 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-08 16:28:05,825 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 0 dummy variables
+2025-12-08 16:28:05,826 - credit_prediction - ERROR - Prediction error: feature_names mismatch: ['Income', 'Debt', 'Loan_Amount', 'Loan_Term', 'Num_Credit_Cards', 'Debt_to_Income', 'Loan_to_Income', 'CDI', 'Gender_Male', 'Education_High School', "Education_Master's", 'Education_PhD', 'Payment_History_Fair', 'Payment_History_Good', 'Payment_History_Poor', 'Employment_Status_Self-Employed', 'Employment_Status_Unemployed', 'Residence_Type_Owned', 'Residence_Type_Rented', 'Marital_Status_Married', 'Marital_Status_Single'] ['Income', 'Debt', 'Loan_Amount', 'Loan_Term', 'Num_Credit_Cards', 'Debt_to_Income', 'Loan_to_Income', 'CDI']
+expected Payment_History_Fair, Education_Master's, Education_High School, Payment_History_Poor, Employment_Status_Unemployed, Employment_Status_Self-Employed, Education_PhD, Residence_Type_Rented, Marital_Status_Married, Marital_Status_Single, Gender_Male, Payment_History_Good, Residence_Type_Owned in input data
+2025-12-08 16:28:07,169 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 16:28:07,169 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 16:28:07,170 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 16:28:07,171 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-08 16:28:07,172 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 0 dummy variables
+2025-12-08 16:28:07,173 - credit_prediction - ERROR - Prediction error: feature_names mismatch: ['Income', 'Debt', 'Loan_Amount', 'Loan_Term', 'Num_Credit_Cards', 'Debt_to_Income', 'Loan_to_Income', 'CDI', 'Gender_Male', 'Education_High School', "Education_Master's", 'Education_PhD', 'Payment_History_Fair', 'Payment_History_Good', 'Payment_History_Poor', 'Employment_Status_Self-Employed', 'Employment_Status_Unemployed', 'Residence_Type_Owned', 'Residence_Type_Rented', 'Marital_Status_Married', 'Marital_Status_Single'] ['Income', 'Debt', 'Loan_Amount', 'Loan_Term', 'Num_Credit_Cards', 'Debt_to_Income', 'Loan_to_Income', 'CDI']
+expected Payment_History_Fair, Education_Master's, Education_High School, Payment_History_Poor, Employment_Status_Unemployed, Employment_Status_Self-Employed, Education_PhD, Residence_Type_Rented, Marital_Status_Married, Marital_Status_Single, Gender_Male, Payment_History_Good, Residence_Type_Owned in input data
+2025-12-08 16:29:45,140 - credit_prediction - INFO - Shutting down API server
+2025-12-08 16:29:51,589 - credit_prediction.model - INFO - Model loaded from models/credit_model.pkl
+2025-12-08 16:29:51,612 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-08 16:29:51,612 - credit_prediction - INFO - Model loaded from models/credit_model.pkl
+2025-12-08 16:30:34,986 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 16:30:34,988 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 16:30:34,989 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 16:30:34,994 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-08 16:30:35,007 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 0 dummy variables
+2025-12-08 16:30:54,215 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 16:30:54,216 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 16:30:54,217 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 16:30:54,219 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-08 16:30:54,225 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 0 dummy variables
+2025-12-08 16:54:22,886 - credit_prediction - INFO - ============================================================
+2025-12-08 16:54:22,886 - credit_prediction - INFO - Fair Credit Score Prediction Pipeline
+2025-12-08 16:54:22,887 - credit_prediction - INFO - ============================================================
+2025-12-08 16:54:22,887 - credit_prediction.utils - INFO - Random seed set to 42
+2025-12-08 16:54:22,887 - credit_prediction - INFO - 
+[STEP 1] Loading and validating data...
+2025-12-08 16:54:22,887 - credit_prediction.data_loader - INFO - Loading data from data/sample_credit_data.csv
+2025-12-08 16:54:22,896 - credit_prediction.data_loader - INFO - Loaded 1000 rows, 13 columns
+2025-12-08 16:54:22,908 - credit_prediction.data_loader - INFO - Validation passed with no issues
+2025-12-08 16:54:22,909 - credit_prediction - INFO - 
+[STEP 2] Preprocessing data...
+2025-12-08 16:54:22,916 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 16:54:22,918 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 16:54:22,919 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 16:54:22,924 - credit_prediction.preprocessing - INFO - CDI calculated: 506/1000 (50.6%) classified as disadvantaged (threshold >= 2)
+2025-12-08 16:54:22,934 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 13 dummy variables
+2025-12-08 16:54:22,936 - credit_prediction.preprocessing - INFO - Prepared features: 21 features, 1000 samples
+2025-12-08 16:54:22,943 - credit_prediction.preprocessing - INFO - Split data: 800 train, 200 test (test_size=0.2, seed=42)
+2025-12-08 16:54:22,948 - credit_prediction - INFO - Training set: 800 samples
+2025-12-08 16:54:22,948 - credit_prediction - INFO - Test set: 200 samples
+2025-12-08 16:54:22,949 - credit_prediction - INFO - 
+[STEP 3] Applying fairness pre-processing...
+2025-12-08 16:54:22,957 - credit_prediction.fairness - INFO - Reweighing applied: weights range [0.964, 1.039]
+2025-12-08 16:54:22,958 - credit_prediction - INFO - Reweighing applied to training data
+2025-12-08 16:54:22,958 - credit_prediction - INFO - 
+[STEP 4] Training model...
+2025-12-08 16:54:22,959 - credit_prediction.model - INFO - Dropped protected attribute 'Proxy_Disadvantaged' from training
+2025-12-08 16:54:22,959 - credit_prediction.model - INFO - Training XGBoost classifier...
+2025-12-08 16:54:23,255 - credit_prediction.model - INFO - Model trained on 800 samples, 21 features
+2025-12-08 16:54:23,255 - credit_prediction - INFO - 
+[STEP 5] Generating predictions and evaluating...
+2025-12-08 16:54:23,296 - credit_prediction.model - INFO - Evaluation metrics:
+2025-12-08 16:54:23,297 - credit_prediction.model - INFO -   accuracy: 0.5650
+2025-12-08 16:54:23,297 - credit_prediction.model - INFO -   precision: 0.6641
+2025-12-08 16:54:23,297 - credit_prediction.model - INFO -   recall: 0.6589
+2025-12-08 16:54:23,297 - credit_prediction.model - INFO -   f1: 0.6615
+2025-12-08 16:54:23,297 - credit_prediction.model - INFO -   roc_auc: 0.5515
+2025-12-08 16:54:23,297 - credit_prediction - INFO - 
+[STEP 6] Applying fairness post-processing...
+2025-12-08 16:54:23,298 - credit_prediction.fairness - INFO - Threshold adjustment applied: privileged=0.5, unprivileged=0.4
+2025-12-08 16:54:23,298 - credit_prediction - INFO - 
+[STEP 7] Calculating fairness metrics...
+2025-12-08 16:54:23,306 - credit_prediction.fairness - INFO - 
+============================================================
+2025-12-08 16:54:23,306 - credit_prediction.fairness - INFO - Fairness Metrics (Before Adjustment)
+2025-12-08 16:54:23,306 - credit_prediction.fairness - INFO - ============================================================
+2025-12-08 16:54:23,306 - credit_prediction.fairness - INFO - Disparate Impact Ratio: 1.1270 (target >= 0.8) [✓ PASS]
+2025-12-08 16:54:23,307 - credit_prediction.fairness - INFO - Statistical Parity Diff: 0.0762 (target < 0.05) [✗ FAIL]
+2025-12-08 16:54:23,307 - credit_prediction.fairness - INFO - Equalized Odds Diff: 0.2143 (target < 0.1) [✗ FAIL]
+2025-12-08 16:54:23,307 - credit_prediction.fairness - INFO - 
+Group Metrics:
+2025-12-08 16:54:23,307 - credit_prediction.fairness - INFO -   Privileged accuracy: 0.6000, positive rate: 0.6000
+2025-12-08 16:54:23,307 - credit_prediction.fairness - INFO -   Unprivileged accuracy: 0.5333, positive rate: 0.6762
+2025-12-08 16:54:23,307 - credit_prediction.fairness - INFO - ============================================================
+
+2025-12-08 16:54:23,313 - credit_prediction.fairness - INFO - 
+============================================================
+2025-12-08 16:54:23,314 - credit_prediction.fairness - INFO - Fairness Metrics (After Adjustment)
+2025-12-08 16:54:23,314 - credit_prediction.fairness - INFO - ============================================================
+2025-12-08 16:54:23,314 - credit_prediction.fairness - INFO - Disparate Impact Ratio: 1.2222 (target >= 0.8) [✓ PASS]
+2025-12-08 16:54:23,314 - credit_prediction.fairness - INFO - Statistical Parity Diff: 0.1333 (target < 0.05) [✗ FAIL]
+2025-12-08 16:54:23,314 - credit_prediction.fairness - INFO - Equalized Odds Diff: 0.2429 (target < 0.1) [✗ FAIL]
+2025-12-08 16:54:23,314 - credit_prediction.fairness - INFO - 
+Group Metrics:
+2025-12-08 16:54:23,314 - credit_prediction.fairness - INFO -   Privileged accuracy: 0.6000, positive rate: 0.6000
+2025-12-08 16:54:23,314 - credit_prediction.fairness - INFO -   Unprivileged accuracy: 0.5714, positive rate: 0.7333
+2025-12-08 16:54:23,314 - credit_prediction.fairness - INFO - ============================================================
+
+2025-12-08 16:54:23,315 - credit_prediction - WARNING - ✗ Some fairness targets not met: ['statistical_parity_difference', 'equalized_odds_difference']
+2025-12-08 16:54:23,315 - credit_prediction - INFO - 
+[STEP 8] Generating explanations...
+2025-12-08 16:54:23,334 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-08 16:54:23,422 - credit_prediction.explainability - INFO - SHAP values calculated for 200 samples
+2025-12-08 16:54:23,890 - credit_prediction.explainability - INFO - Global feature importance plot saved to reports/figures/feature_importance_shap.png
+2025-12-08 16:54:24,288 - credit_prediction.explainability - INFO - Detailed SHAP plot saved to reports/figures/feature_importance_detailed.png
+2025-12-08 16:54:24,288 - credit_prediction.utils - INFO - Random seed set to 42
+2025-12-08 16:54:24,304 - credit_prediction.explainability - INFO - SHAP values calculated for 200 samples
+2025-12-08 16:54:24,310 - credit_prediction.explainability - INFO - Generated 5 explanations in explanations
+2025-12-08 16:54:24,310 - credit_prediction - INFO - 
+[STEP 9] Saving artifacts...
+2025-12-08 16:54:24,313 - credit_prediction.model - INFO - Model v20251208_165422 saved to models/credit_model.pkl
+2025-12-08 16:54:24,314 - credit_prediction.preprocessing - INFO - Preprocessor saved to models/preprocessor.pkl
+2025-12-08 16:54:24,314 - credit_prediction - INFO - Metrics saved to outputs/metrics.json
+2025-12-08 16:54:24,314 - credit_prediction - INFO - 
+============================================================
+2025-12-08 16:54:24,314 - credit_prediction - INFO - PIPELINE COMPLETE
+2025-12-08 16:54:24,314 - credit_prediction - INFO - ============================================================
+2025-12-08 16:54:24,315 - credit_prediction - INFO - Model Accuracy: 0.5650
+2025-12-08 16:54:24,315 - credit_prediction - INFO - Disparate Impact: 1.2222
+2025-12-08 16:54:24,315 - credit_prediction - INFO - Statistical Parity Diff: 0.1333
+2025-12-08 16:54:24,315 - credit_prediction - INFO - Equalized Odds Diff: 0.2429
+2025-12-08 16:54:24,315 - credit_prediction - INFO - Explanations generated: 5
+2025-12-08 16:54:24,315 - credit_prediction - INFO - ============================================================
+
+2025-12-08 16:54:36,947 - credit_prediction.model - INFO - Model v20251208_165422 loaded from models/credit_model.pkl
+2025-12-08 16:54:36,982 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-08 16:54:36,982 - credit_prediction - INFO - Model loaded from models/credit_model.pkl
+2025-12-08 16:54:36,983 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-08 16:54:36,983 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-08 16:54:46,126 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 16:54:46,130 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 16:54:46,131 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 16:54:46,135 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-08 16:54:53,209 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 16:54:53,214 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 16:54:53,214 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 16:54:53,216 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-08 16:54:54,691 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 16:54:54,717 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 16:54:54,718 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 16:54:54,721 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+<<<<<<< HEAD
+=======
+2025-12-08 21:45:20,877 - credit_prediction - INFO - Starting benchmarking run...
+2025-12-08 21:45:20,879 - credit_prediction.data_loader - INFO - Loading data from data/sample_credit_data.csv
+2025-12-08 21:45:20,896 - credit_prediction.data_loader - INFO - Loaded 1000 rows, 13 columns
+2025-12-08 21:45:20,903 - credit_prediction.data_loader - INFO - Validation passed with no issues
+2025-12-08 21:45:20,908 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 21:45:20,910 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 21:45:20,911 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 21:45:20,912 - credit_prediction.preprocessing - INFO - CDI calculated: 506/1000 (50.6%) classified as disadvantaged (threshold >= 2)
+2025-12-08 21:45:20,917 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 13 dummy variables
+2025-12-08 21:45:20,918 - credit_prediction.preprocessing - INFO - Prepared features: 21 features, 1000 samples
+2025-12-08 21:45:20,922 - credit_prediction.preprocessing - INFO - Split data: 800 train, 200 test (test_size=0.2, seed=42)
+2025-12-08 21:45:20,927 - credit_prediction.fairness - INFO - Reweighing applied: weights range [0.964, 1.039]
+2025-12-08 21:45:20,928 - credit_prediction - INFO - Training benchmark model: XGBoost
+2025-12-08 21:45:21,029 - credit_prediction - INFO - Training benchmark model: Random Forest
+2025-12-08 21:45:21,475 - credit_prediction - INFO - Training benchmark model: Logistic Regression
+2025-12-08 21:46:41,657 - credit_prediction - INFO - Starting benchmarking run...
+2025-12-08 21:46:41,658 - credit_prediction.data_loader - INFO - Loading data from data/sample_credit_data.csv
+2025-12-08 21:46:41,682 - credit_prediction.data_loader - INFO - Loaded 1000 rows, 13 columns
+2025-12-08 21:46:41,737 - credit_prediction.data_loader - INFO - Validation passed with no issues
+2025-12-08 21:46:41,761 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 21:46:41,765 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 21:46:41,775 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 21:46:41,781 - credit_prediction.preprocessing - INFO - CDI calculated: 506/1000 (50.6%) classified as disadvantaged (threshold >= 2)
+2025-12-08 21:46:41,795 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 13 dummy variables
+2025-12-08 21:46:41,797 - credit_prediction.preprocessing - INFO - Prepared features: 21 features, 1000 samples
+2025-12-08 21:46:41,804 - credit_prediction.preprocessing - INFO - Split data: 800 train, 200 test (test_size=0.2, seed=42)
+2025-12-08 21:46:41,814 - credit_prediction.fairness - INFO - Reweighing applied: weights range [0.964, 1.039]
+2025-12-08 21:46:41,815 - credit_prediction - INFO - Training benchmark model: XGBoost
+2025-12-08 21:46:41,930 - credit_prediction - INFO - Training benchmark model: Random Forest
+2025-12-08 21:46:42,444 - credit_prediction - INFO - Training benchmark model: Logistic Regression
+2025-12-08 21:47:33,430 - credit_prediction - INFO - Starting benchmarking run...
+2025-12-08 21:47:33,432 - credit_prediction.data_loader - INFO - Loading data from data/sample_credit_data.csv
+2025-12-08 21:47:33,450 - credit_prediction.data_loader - INFO - Loaded 1000 rows, 13 columns
+2025-12-08 21:47:33,459 - credit_prediction.data_loader - INFO - Validation passed with no issues
+2025-12-08 21:47:33,463 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 21:47:33,466 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 21:47:33,470 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 21:47:33,476 - credit_prediction.preprocessing - INFO - CDI calculated: 506/1000 (50.6%) classified as disadvantaged (threshold >= 2)
+2025-12-08 21:47:33,487 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 13 dummy variables
+2025-12-08 21:47:33,489 - credit_prediction.preprocessing - INFO - Prepared features: 21 features, 1000 samples
+2025-12-08 21:47:33,493 - credit_prediction.preprocessing - INFO - Split data: 800 train, 200 test (test_size=0.2, seed=42)
+2025-12-08 21:47:33,500 - credit_prediction.fairness - INFO - Reweighing applied: weights range [0.964, 1.039]
+2025-12-08 21:47:33,501 - credit_prediction - INFO - Training benchmark model: XGBoost
+2025-12-08 21:47:33,622 - credit_prediction - INFO - Training benchmark model: Random Forest
+2025-12-08 21:47:34,107 - credit_prediction - INFO - Training benchmark model: Logistic Regression
+2025-12-08 21:52:26,651 - credit_prediction - INFO - Starting benchmarking run...
+2025-12-08 21:52:26,652 - credit_prediction.data_loader - INFO - Loading data from data/sample_credit_data.csv
+2025-12-08 21:52:26,668 - credit_prediction.data_loader - INFO - Loaded 1000 rows, 13 columns
+2025-12-08 21:52:26,675 - credit_prediction.data_loader - INFO - Validation passed with no issues
+2025-12-08 21:52:26,679 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 21:52:26,681 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 21:52:26,681 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 21:52:26,683 - credit_prediction.preprocessing - INFO - CDI calculated: 506/1000 (50.6%) classified as disadvantaged (threshold >= 2)
+2025-12-08 21:52:26,688 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 13 dummy variables
+2025-12-08 21:52:26,689 - credit_prediction.preprocessing - INFO - Prepared features: 21 features, 1000 samples
+2025-12-08 21:52:26,693 - credit_prediction.preprocessing - INFO - Split data: 800 train, 200 test (test_size=0.2, seed=42)
+2025-12-08 21:52:26,699 - credit_prediction.fairness - INFO - Reweighing applied: weights range [0.964, 1.039]
+2025-12-08 21:52:26,700 - credit_prediction - INFO - Training benchmark model: XGBoost
+2025-12-08 21:52:26,806 - credit_prediction - INFO - Training benchmark model: Random Forest
+2025-12-08 21:52:27,212 - credit_prediction - INFO - Training benchmark model: Logistic Regression
+2025-12-08 21:54:05,682 - credit_prediction - INFO - Starting benchmarking run...
+2025-12-08 21:54:05,682 - credit_prediction.data_loader - INFO - Loading data from data/sample_credit_data.csv
+2025-12-08 21:54:05,698 - credit_prediction.data_loader - INFO - Loaded 1000 rows, 13 columns
+2025-12-08 21:54:05,704 - credit_prediction.data_loader - INFO - Validation passed with no issues
+2025-12-08 21:54:05,707 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 21:54:05,709 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 21:54:05,710 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 21:54:05,712 - credit_prediction.preprocessing - INFO - CDI calculated: 506/1000 (50.6%) classified as disadvantaged (threshold >= 2)
+2025-12-08 21:54:05,717 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 13 dummy variables
+2025-12-08 21:54:05,717 - credit_prediction.preprocessing - INFO - Prepared features: 21 features, 1000 samples
+2025-12-08 21:54:05,721 - credit_prediction.preprocessing - INFO - Split data: 800 train, 200 test (test_size=0.2, seed=42)
+2025-12-08 21:54:05,727 - credit_prediction.fairness - INFO - Reweighing applied: weights range [0.964, 1.039]
+2025-12-08 21:54:05,727 - credit_prediction - INFO - Training benchmark model: XGBoost
+2025-12-08 21:54:05,827 - credit_prediction - INFO - Training benchmark model: Random Forest
+2025-12-08 21:54:06,211 - credit_prediction - INFO - Training benchmark model: Logistic Regression
+2025-12-08 22:11:37,488 - credit_prediction.model - INFO - Model v20251208_165422 loaded from models/credit_model.pkl
+2025-12-08 22:11:37,509 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-08 22:11:37,509 - credit_prediction - INFO - Model loaded from models/credit_model.pkl
+2025-12-08 22:11:37,510 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-08 22:11:37,510 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-08 22:11:45,057 - credit_prediction.model - INFO - Model v20251208_165422 loaded from models/credit_model.pkl
+2025-12-08 22:11:45,074 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-08 22:11:45,074 - credit_prediction - INFO - Model loaded from models/credit_model.pkl
+2025-12-08 22:11:45,075 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-08 22:11:45,075 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+>>>>>>> codex
+2025-12-08 23:05:37,803 - credit_prediction - INFO - ============================================================
+2025-12-08 23:05:37,804 - credit_prediction - INFO - Fair Credit Score Prediction Pipeline
+2025-12-08 23:05:37,804 - credit_prediction - INFO - ============================================================
+2025-12-08 23:05:37,804 - credit_prediction.utils - INFO - Random seed set to 42
+2025-12-08 23:05:37,804 - credit_prediction - INFO - 
+[STEP 1] Loading data...
+2025-12-08 23:05:37,804 - credit_prediction.data_loader - INFO - Loading data from data/sample_credit_data.csv
+2025-12-08 23:05:37,808 - credit_prediction.data_loader - INFO - Loaded 1000 rows, 13 columns
+2025-12-08 23:05:37,808 - credit_prediction - INFO - Running data validation...
+2025-12-08 23:05:37,814 - credit_prediction.data_loader - INFO - Validation passed with no issues
+2025-12-08 23:05:37,814 - credit_prediction - INFO - 
+[STEP 2] Preprocessing data...
+2025-12-08 23:05:37,817 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 23:05:37,818 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 23:05:37,818 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 23:05:37,820 - credit_prediction.preprocessing - INFO - CDI calculated: 506/1000 (50.6%) classified as disadvantaged (threshold >= 2)
+2025-12-08 23:05:37,825 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 13 dummy variables
+2025-12-08 23:05:37,826 - credit_prediction.preprocessing - INFO - Prepared features: 21 features, 1000 samples
+2025-12-08 23:05:37,829 - credit_prediction.preprocessing - INFO - Split data: 800 train, 200 test (test_size=0.2, seed=42)
+2025-12-08 23:05:37,831 - credit_prediction - INFO - Training set: 800 samples
+2025-12-08 23:05:37,831 - credit_prediction - INFO - Test set: 200 samples
+2025-12-08 23:05:37,831 - credit_prediction - INFO - 
+[STEP 3] Applying fairness pre-processing...
+2025-12-08 23:05:37,833 - credit_prediction.fairness - INFO - Reweighing applied: weights range [0.964, 1.039]
+2025-12-08 23:05:37,833 - credit_prediction - INFO - Reweighing applied to training data
+2025-12-08 23:05:37,833 - credit_prediction - INFO - 
+[STEP 4] Training model...
+2025-12-08 23:05:37,834 - credit_prediction.model - INFO - Dropped protected attribute 'Proxy_Disadvantaged' from training
+2025-12-08 23:05:37,834 - credit_prediction.model - INFO - Training XGBoost classifier...
+2025-12-08 23:05:38,055 - credit_prediction.model - INFO - Model trained on 800 samples, 21 features
+2025-12-08 23:05:38,055 - credit_prediction - INFO - 
+[STEP 5] Generating predictions and evaluating...
+2025-12-08 23:05:38,075 - credit_prediction.model - INFO - Evaluation metrics:
+2025-12-08 23:05:38,075 - credit_prediction.model - INFO -   accuracy: 0.5650
+2025-12-08 23:05:38,075 - credit_prediction.model - INFO -   precision: 0.6641
+2025-12-08 23:05:38,075 - credit_prediction.model - INFO -   recall: 0.6589
+2025-12-08 23:05:38,076 - credit_prediction.model - INFO -   f1: 0.6615
+2025-12-08 23:05:38,076 - credit_prediction.model - INFO -   roc_auc: 0.5515
+2025-12-08 23:05:38,076 - credit_prediction - INFO - 
+[STEP 6] Applying fairness post-processing...
+2025-12-08 23:05:38,076 - credit_prediction.fairness - INFO - Threshold adjustment applied: privileged=0.5, unprivileged=0.4
+2025-12-08 23:05:38,076 - credit_prediction - INFO - 
+[STEP 7] Calculating fairness metrics...
+2025-12-08 23:05:38,079 - credit_prediction.fairness - INFO - 
+============================================================
+2025-12-08 23:05:38,079 - credit_prediction.fairness - INFO - Fairness Metrics (Before Adjustment)
+2025-12-08 23:05:38,079 - credit_prediction.fairness - INFO - ============================================================
+2025-12-08 23:05:38,079 - credit_prediction.fairness - INFO - Disparate Impact Ratio: 1.1270 (target >= 0.8) [✓ PASS]
+2025-12-08 23:05:38,079 - credit_prediction.fairness - INFO - Statistical Parity Diff: 0.0762 (target < 0.05) [✗ FAIL]
+2025-12-08 23:05:38,079 - credit_prediction.fairness - INFO - Equalized Odds Diff: 0.2143 (target < 0.1) [✗ FAIL]
+2025-12-08 23:05:38,079 - credit_prediction.fairness - INFO - 
+Group Metrics:
+2025-12-08 23:05:38,079 - credit_prediction.fairness - INFO -   Privileged accuracy: 0.6000, positive rate: 0.6000
+2025-12-08 23:05:38,079 - credit_prediction.fairness - INFO -   Unprivileged accuracy: 0.5333, positive rate: 0.6762
+2025-12-08 23:05:38,079 - credit_prediction.fairness - INFO - ============================================================
+
+2025-12-08 23:05:38,082 - credit_prediction.fairness - INFO - 
+============================================================
+2025-12-08 23:05:38,082 - credit_prediction.fairness - INFO - Fairness Metrics (After Adjustment)
+2025-12-08 23:05:38,082 - credit_prediction.fairness - INFO - ============================================================
+2025-12-08 23:05:38,083 - credit_prediction.fairness - INFO - Disparate Impact Ratio: 1.2222 (target >= 0.8) [✓ PASS]
+2025-12-08 23:05:38,083 - credit_prediction.fairness - INFO - Statistical Parity Diff: 0.1333 (target < 0.05) [✗ FAIL]
+2025-12-08 23:05:38,083 - credit_prediction.fairness - INFO - Equalized Odds Diff: 0.2429 (target < 0.1) [✗ FAIL]
+2025-12-08 23:05:38,083 - credit_prediction.fairness - INFO - 
+Group Metrics:
+2025-12-08 23:05:38,083 - credit_prediction.fairness - INFO -   Privileged accuracy: 0.6000, positive rate: 0.6000
+2025-12-08 23:05:38,083 - credit_prediction.fairness - INFO -   Unprivileged accuracy: 0.5714, positive rate: 0.7333
+2025-12-08 23:05:38,083 - credit_prediction.fairness - INFO - ============================================================
+
+2025-12-08 23:05:38,083 - credit_prediction - WARNING - ✗ Some fairness targets not met: ['statistical_parity_difference', 'equalized_odds_difference']
+2025-12-08 23:05:38,083 - credit_prediction - INFO - 
+[STEP 8] Generating explanations...
+2025-12-08 23:05:38,094 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-08 23:05:38,105 - credit_prediction.explainability - INFO - SHAP values calculated for 200 samples
+2025-12-08 23:05:38,421 - credit_prediction.explainability - INFO - Global feature importance plot saved to reports/figures/feature_importance_shap.png
+2025-12-08 23:05:38,635 - credit_prediction.explainability - INFO - Detailed SHAP plot saved to reports/figures/feature_importance_detailed.png
+2025-12-08 23:05:38,636 - credit_prediction.utils - INFO - Random seed set to 42
+2025-12-08 23:05:38,646 - credit_prediction.explainability - INFO - SHAP values calculated for 200 samples
+2025-12-08 23:05:38,648 - credit_prediction.explainability - INFO - Generated 5 explanations in explanations
+2025-12-08 23:05:38,648 - credit_prediction - INFO - 
+[STEP 9] Saving artifacts...
+2025-12-08 23:05:38,651 - credit_prediction.model - INFO - Model v20251208_230537 saved to models/credit_model.pkl
+2025-12-08 23:05:38,651 - credit_prediction.preprocessing - INFO - Preprocessor saved to models/preprocessor.pkl
+2025-12-08 23:05:38,652 - credit_prediction - INFO - Metrics saved to outputs/metrics.json
+2025-12-08 23:05:38,652 - credit_prediction - INFO - 
+============================================================
+2025-12-08 23:05:38,652 - credit_prediction - INFO - PIPELINE COMPLETE
+2025-12-08 23:05:38,652 - credit_prediction - INFO - ============================================================
+2025-12-08 23:05:38,652 - credit_prediction - INFO - Model Accuracy: 0.5650
+2025-12-08 23:05:38,652 - credit_prediction - INFO - Disparate Impact: 1.2222
+2025-12-08 23:05:38,652 - credit_prediction - INFO - Statistical Parity Diff: 0.1333
+2025-12-08 23:05:38,652 - credit_prediction - INFO - Equalized Odds Diff: 0.2429
+2025-12-08 23:05:38,652 - credit_prediction - INFO - Explanations generated: 5
+2025-12-08 23:05:38,652 - credit_prediction - INFO - ============================================================
+
+2025-12-08 23:05:38,652 - credit_prediction.cli - INFO - Pipeline completed successfully!
+2025-12-08 23:05:38,652 - credit_prediction.cli - INFO - Trained model saved: models/credit_model.pkl
+2025-12-08 23:05:38,652 - credit_prediction.cli - INFO - Evaluation metrics: {'accuracy': 0.565, 'precision': 0.6640625, 'recall': 0.6589147286821705, 'f1': 0.6614785992217899, 'roc_auc': 0.5514794191505623}
+2025-12-08 23:09:27,018 - credit_prediction.model - INFO - Model v20251208_230537 loaded from /Users/pierce/cred/credprediction/models/credit_model.pkl
+2025-12-08 23:09:27,031 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-08 23:09:27,031 - credit_prediction - INFO - Model loaded from /Users/pierce/cred/credprediction/models/credit_model.pkl
+2025-12-08 23:09:27,033 - credit_prediction.model - INFO - Model v20251208_230537 loaded from /Users/pierce/cred/credprediction/models/credit_model.pkl
+2025-12-08 23:09:27,043 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-08 23:09:27,043 - credit_prediction - INFO - Model loaded from /Users/pierce/cred/credprediction/models/credit_model.pkl
+2025-12-08 23:09:27,044 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-08 23:09:27,044 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-08 23:09:43,171 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-08 23:09:48,618 - credit_prediction.model - INFO - Model v20251208_230537 loaded from /Users/pierce/cred/credprediction/models/credit_model.pkl
+2025-12-08 23:09:48,629 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-08 23:09:48,629 - credit_prediction - INFO - Model loaded from /Users/pierce/cred/credprediction/models/credit_model.pkl
+2025-12-08 23:09:48,631 - credit_prediction.model - INFO - Model v20251208_230537 loaded from /Users/pierce/cred/credprediction/models/credit_model.pkl
+2025-12-08 23:09:48,643 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-08 23:09:48,644 - credit_prediction - INFO - Model loaded from /Users/pierce/cred/credprediction/models/credit_model.pkl
+2025-12-08 23:09:48,644 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-08 23:09:48,644 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-08 23:09:59,297 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-08 23:09:59,298 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-08 23:09:59,299 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-08 23:09:59,300 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-08 23:10:05,446 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-11 16:41:06,289 - credit_prediction.model - INFO - Model v20251208_230537 loaded from models/credit_model.pkl
+2025-12-11 16:41:06,296 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-11 16:41:06,296 - credit_prediction - INFO - Model loaded from models/credit_model.pkl
+2025-12-11 16:41:06,297 - credit_prediction.model - INFO - Model v20251208_230537 loaded from models/credit_model.pkl
+2025-12-11 16:41:06,302 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-11 16:41:06,302 - credit_prediction - INFO - Model loaded from models/credit_model.pkl
+2025-12-11 16:41:06,302 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-11 16:41:06,302 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-11 16:41:24,231 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-11 16:41:24,232 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-11 16:41:24,233 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-11 16:41:24,235 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-11 16:41:26,401 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-11 16:41:26,401 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-11 16:41:26,402 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-11 16:41:26,403 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-11 18:17:38,211 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-11 18:17:38,214 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-11 18:17:38,214 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-11 18:17:38,216 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-11 18:18:01,825 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-11 18:18:01,826 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-11 18:18:01,827 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-11 18:18:01,830 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-11 18:18:09,053 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-11 18:18:09,054 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-11 18:18:09,055 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-11 18:18:09,057 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 07:33:56,333 - credit_prediction - INFO - ============================================================
+2025-12-17 07:33:56,337 - credit_prediction - INFO - Fair Credit Score Prediction Pipeline
+2025-12-17 07:33:56,337 - credit_prediction - INFO - ============================================================
+2025-12-17 07:33:56,337 - credit_prediction.utils - INFO - Random seed set to 42
+2025-12-17 07:33:56,337 - credit_prediction - INFO - 
+[STEP 1] Loading data...
+2025-12-17 07:33:56,337 - credit_prediction.data_loader - INFO - Loading data from data/sample_credit_data.csv
+2025-12-17 07:33:56,346 - credit_prediction.data_loader - INFO - Loaded 1000 rows, 13 columns
+2025-12-17 07:33:56,346 - credit_prediction - INFO - Running data validation...
+2025-12-17 07:33:56,352 - credit_prediction.data_loader - INFO - Validation passed with no issues
+2025-12-17 07:33:56,352 - credit_prediction - INFO - 
+[STEP 2] Preprocessing data...
+2025-12-17 07:33:56,355 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 07:33:56,356 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 07:33:56,356 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 07:33:56,357 - credit_prediction.preprocessing - INFO - CDI calculated: 506/1000 (50.6%) classified as disadvantaged (threshold >= 2)
+2025-12-17 07:33:56,361 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 13 dummy variables
+2025-12-17 07:33:56,361 - credit_prediction.preprocessing - INFO - Prepared features: 21 features, 1000 samples
+2025-12-17 07:33:56,364 - credit_prediction.preprocessing - INFO - Split data: 800 train, 200 test (test_size=0.2, seed=42)
+2025-12-17 07:33:56,366 - credit_prediction - INFO - Training set: 800 samples
+2025-12-17 07:33:56,366 - credit_prediction - INFO - Test set: 200 samples
+2025-12-17 07:33:56,366 - credit_prediction - INFO - 
+[STEP 3] Applying fairness pre-processing...
+2025-12-17 07:33:56,368 - credit_prediction.fairness - INFO - Reweighing applied: weights range [0.964, 1.039]
+2025-12-17 07:33:56,368 - credit_prediction - INFO - Reweighing applied to training data
+2025-12-17 07:33:56,368 - credit_prediction - INFO - 
+[STEP 4] Training model...
+2025-12-17 07:33:56,369 - credit_prediction.model - INFO - Dropped protected attribute 'Proxy_Disadvantaged' from training
+2025-12-17 07:33:56,369 - credit_prediction.model - INFO - Training XGBoost classifier...
+2025-12-17 07:33:56,504 - credit_prediction.model - INFO - Model trained on 800 samples, 21 features
+2025-12-17 07:33:56,505 - credit_prediction - INFO - 
+[STEP 5] Generating predictions and evaluating...
+2025-12-17 07:33:56,520 - credit_prediction.model - INFO - Evaluation metrics:
+2025-12-17 07:33:56,520 - credit_prediction.model - INFO -   accuracy: 0.5650
+2025-12-17 07:33:56,520 - credit_prediction.model - INFO -   precision: 0.6641
+2025-12-17 07:33:56,520 - credit_prediction.model - INFO -   recall: 0.6589
+2025-12-17 07:33:56,520 - credit_prediction.model - INFO -   f1: 0.6615
+2025-12-17 07:33:56,520 - credit_prediction.model - INFO -   roc_auc: 0.5515
+2025-12-17 07:33:56,520 - credit_prediction - INFO - 
+[STEP 6] Applying fairness post-processing...
+2025-12-17 07:33:56,520 - credit_prediction.fairness - INFO - Threshold adjustment applied: privileged=0.5, unprivileged=0.4
+2025-12-17 07:33:56,520 - credit_prediction - INFO - 
+[STEP 7] Calculating fairness metrics...
+2025-12-17 07:33:56,527 - credit_prediction.fairness - INFO - 
+============================================================
+2025-12-17 07:33:56,528 - credit_prediction.fairness - INFO - Fairness Metrics (Before Adjustment)
+2025-12-17 07:33:56,528 - credit_prediction.fairness - INFO - ============================================================
+2025-12-17 07:33:56,528 - credit_prediction.fairness - INFO - Disparate Impact Ratio: 1.1270 (target >= 0.8) [✓ PASS]
+2025-12-17 07:33:56,528 - credit_prediction.fairness - INFO - Statistical Parity Diff: 0.0762 (target < 0.05) [✗ FAIL]
+2025-12-17 07:33:56,528 - credit_prediction.fairness - INFO - Equalized Odds Diff: 0.2143 (target < 0.1) [✗ FAIL]
+2025-12-17 07:33:56,528 - credit_prediction.fairness - INFO - 
+Group Metrics:
+2025-12-17 07:33:56,528 - credit_prediction.fairness - INFO -   Privileged accuracy: 0.6000, positive rate: 0.6000
+2025-12-17 07:33:56,528 - credit_prediction.fairness - INFO -   Unprivileged accuracy: 0.5333, positive rate: 0.6762
+2025-12-17 07:33:56,528 - credit_prediction.fairness - INFO - ============================================================
+
+2025-12-17 07:33:56,530 - credit_prediction.fairness - INFO - 
+============================================================
+2025-12-17 07:33:56,530 - credit_prediction.fairness - INFO - Fairness Metrics (After Adjustment)
+2025-12-17 07:33:56,530 - credit_prediction.fairness - INFO - ============================================================
+2025-12-17 07:33:56,530 - credit_prediction.fairness - INFO - Disparate Impact Ratio: 1.2222 (target >= 0.8) [✓ PASS]
+2025-12-17 07:33:56,530 - credit_prediction.fairness - INFO - Statistical Parity Diff: 0.1333 (target < 0.05) [✗ FAIL]
+2025-12-17 07:33:56,530 - credit_prediction.fairness - INFO - Equalized Odds Diff: 0.2429 (target < 0.1) [✗ FAIL]
+2025-12-17 07:33:56,531 - credit_prediction.fairness - INFO - 
+Group Metrics:
+2025-12-17 07:33:56,531 - credit_prediction.fairness - INFO -   Privileged accuracy: 0.6000, positive rate: 0.6000
+2025-12-17 07:33:56,531 - credit_prediction.fairness - INFO -   Unprivileged accuracy: 0.5714, positive rate: 0.7333
+2025-12-17 07:33:56,531 - credit_prediction.fairness - INFO - ============================================================
+
+2025-12-17 07:33:56,531 - credit_prediction - WARNING - ✗ Some fairness targets not met: ['statistical_parity_difference', 'equalized_odds_difference']
+2025-12-17 07:33:56,531 - credit_prediction - INFO - 
+[STEP 8] Generating explanations...
+2025-12-17 07:33:56,538 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:33:56,548 - credit_prediction.explainability - INFO - SHAP values calculated for 200 samples
+2025-12-17 07:33:56,842 - credit_prediction.explainability - INFO - Global feature importance plot saved to reports/figures/feature_importance_shap.png
+2025-12-17 07:33:57,034 - credit_prediction.explainability - INFO - Detailed SHAP plot saved to reports/figures/feature_importance_detailed.png
+2025-12-17 07:33:57,034 - credit_prediction.utils - INFO - Random seed set to 42
+2025-12-17 07:33:57,044 - credit_prediction.explainability - INFO - SHAP values calculated for 200 samples
+2025-12-17 07:33:57,047 - credit_prediction.explainability - INFO - Generated 5 explanations in explanations
+2025-12-17 07:33:57,047 - credit_prediction - INFO - 
+[STEP 9] Saving artifacts...
+2025-12-17 07:33:57,048 - credit_prediction.model - INFO - Model v20251217_073356 saved to models/credit_model.pkl
+2025-12-17 07:33:57,048 - credit_prediction.preprocessing - INFO - Preprocessor saved to models/preprocessor.pkl
+2025-12-17 07:33:57,049 - credit_prediction - INFO - Metrics saved to outputs/metrics.json
+2025-12-17 07:33:57,049 - credit_prediction - INFO - 
+============================================================
+2025-12-17 07:33:57,049 - credit_prediction - INFO - PIPELINE COMPLETE
+2025-12-17 07:33:57,049 - credit_prediction - INFO - ============================================================
+2025-12-17 07:33:57,049 - credit_prediction - INFO - Model Accuracy: 0.5650
+2025-12-17 07:33:57,049 - credit_prediction - INFO - Disparate Impact: 1.2222
+2025-12-17 07:33:57,049 - credit_prediction - INFO - Statistical Parity Diff: 0.1333
+2025-12-17 07:33:57,049 - credit_prediction - INFO - Equalized Odds Diff: 0.2429
+2025-12-17 07:33:57,049 - credit_prediction - INFO - Explanations generated: 5
+2025-12-17 07:33:57,049 - credit_prediction - INFO - ============================================================
+
+2025-12-17 07:33:57,049 - credit_prediction.cli - INFO - Pipeline completed successfully!
+2025-12-17 07:33:57,049 - credit_prediction.cli - INFO - Trained model saved: models/credit_model.pkl
+2025-12-17 07:33:57,049 - credit_prediction.cli - INFO - Evaluation metrics: {'accuracy': 0.565, 'precision': 0.6640625, 'recall': 0.6589147286821705, 'f1': 0.6614785992217899, 'roc_auc': 0.5514794191505623}
+2025-12-17 07:34:18,883 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:34:18,894 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:34:18,894 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:34:18,895 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:34:18,902 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:34:18,902 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:34:18,903 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:34:18,903 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:34:52,778 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 07:34:52,783 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 07:34:52,783 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 07:34:52,786 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 07:35:24,833 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 07:35:24,834 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 07:35:24,834 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 07:35:24,835 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 07:35:24,849 - credit_prediction.explainability - INFO - SHAP values calculated for 1 samples
+2025-12-17 07:43:30,789 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 07:43:34,757 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:43:34,772 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:43:34,772 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:43:34,773 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:43:34,780 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:43:34,780 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:43:34,781 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:43:34,781 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:46:39,792 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 07:46:42,691 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:46:42,700 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:46:42,700 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:46:42,701 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:46:42,709 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:46:42,709 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:46:42,709 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:46:42,709 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:48:24,435 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 07:48:26,874 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:48:26,884 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:48:26,884 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:48:26,885 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:48:26,892 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:48:26,892 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:48:26,892 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:48:26,892 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:48:50,441 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 07:48:52,310 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:48:52,318 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:48:52,318 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:48:52,319 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:48:52,326 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:48:52,326 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:48:52,326 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:48:52,326 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:49:02,750 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 07:49:04,386 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:49:04,394 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:49:04,394 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:49:04,394 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:49:04,401 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:49:04,401 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:49:04,402 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:49:04,402 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:49:10,771 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 07:49:18,022 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:49:18,033 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:49:18,033 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:49:18,034 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:49:18,041 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:49:18,041 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:49:18,041 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:49:18,041 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:52:52,109 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 07:52:57,021 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:52:57,043 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:52:57,043 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:52:57,044 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:52:57,052 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:52:57,052 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:52:57,052 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:52:57,052 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:52:57,760 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 07:54:32,961 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:54:32,970 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:54:32,970 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:54:32,971 - credit_prediction.model - INFO - Model v20251217_073356 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:54:32,977 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 07:54:32,977 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 07:54:32,978 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 07:54:32,978 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 08:02:11,646 - credit_prediction - INFO - ============================================================
+2025-12-17 08:02:11,647 - credit_prediction - INFO - Fair Credit Score Prediction Pipeline
+2025-12-17 08:02:11,647 - credit_prediction - INFO - ============================================================
+2025-12-17 08:02:11,647 - credit_prediction.utils - INFO - Random seed set to 42
+2025-12-17 08:02:11,647 - credit_prediction - INFO - 
+[STEP 1] Loading data...
+2025-12-17 08:02:11,647 - credit_prediction.data_loader - INFO - Loading data from data/sample_credit_data.csv
+2025-12-17 08:02:11,651 - credit_prediction.data_loader - INFO - Loaded 1000 rows, 13 columns
+2025-12-17 08:02:11,651 - credit_prediction - INFO - Running data validation...
+2025-12-17 08:02:11,655 - credit_prediction.data_loader - INFO - Validation passed with no issues
+2025-12-17 08:02:11,655 - credit_prediction - INFO - 
+[STEP 2] Preprocessing data...
+2025-12-17 08:02:11,658 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 08:02:11,658 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 08:02:11,658 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 08:02:11,659 - credit_prediction.preprocessing - INFO - CDI calculated: 506/1000 (50.6%) classified as disadvantaged (threshold >= 2)
+2025-12-17 08:02:11,665 - credit_prediction.preprocessing - INFO - Encoded 6 categorical columns into 13 dummy variables
+2025-12-17 08:02:11,666 - credit_prediction.preprocessing - INFO - Prepared features: 21 features, 1000 samples
+2025-12-17 08:02:11,670 - credit_prediction.preprocessing - INFO - Split data: 800 train, 200 test (test_size=0.2, seed=42)
+2025-12-17 08:02:11,672 - credit_prediction - INFO - Training set: 800 samples
+2025-12-17 08:02:11,672 - credit_prediction - INFO - Test set: 200 samples
+2025-12-17 08:02:11,672 - credit_prediction - INFO - 
+[STEP 3] Applying fairness pre-processing...
+2025-12-17 08:02:11,674 - credit_prediction.fairness - INFO - Reweighing applied: weights range [0.964, 1.039]
+2025-12-17 08:02:11,674 - credit_prediction - INFO - Reweighing applied to training data
+2025-12-17 08:02:11,674 - credit_prediction - INFO - 
+[STEP 4] Training model...
+2025-12-17 08:02:11,674 - credit_prediction.model - INFO - Dropped protected attribute 'Proxy_Disadvantaged' from training
+2025-12-17 08:02:11,674 - credit_prediction.model - INFO - Training XGBoost classifier...
+2025-12-17 08:02:11,829 - credit_prediction.model - INFO - Model trained on 800 samples, 21 features
+2025-12-17 08:02:11,830 - credit_prediction - INFO - 
+[STEP 5] Generating predictions and evaluating...
+2025-12-17 08:02:11,850 - credit_prediction.model - INFO - Evaluation metrics:
+2025-12-17 08:02:11,850 - credit_prediction.model - INFO -   accuracy: 0.5650
+2025-12-17 08:02:11,850 - credit_prediction.model - INFO -   precision: 0.6641
+2025-12-17 08:02:11,850 - credit_prediction.model - INFO -   recall: 0.6589
+2025-12-17 08:02:11,850 - credit_prediction.model - INFO -   f1: 0.6615
+2025-12-17 08:02:11,850 - credit_prediction.model - INFO -   roc_auc: 0.5515
+2025-12-17 08:02:11,850 - credit_prediction - INFO - 
+[STEP 6] Applying fairness post-processing...
+2025-12-17 08:02:11,850 - credit_prediction.fairness - INFO - Threshold adjustment applied: privileged=0.5, unprivileged=0.4
+2025-12-17 08:02:11,850 - credit_prediction - INFO - 
+[STEP 7] Calculating fairness metrics...
+2025-12-17 08:02:11,853 - credit_prediction.fairness - INFO - 
+============================================================
+2025-12-17 08:02:11,853 - credit_prediction.fairness - INFO - Fairness Metrics (Before Adjustment)
+2025-12-17 08:02:11,853 - credit_prediction.fairness - INFO - ============================================================
+2025-12-17 08:02:11,853 - credit_prediction.fairness - INFO - Disparate Impact Ratio: 1.1270 (target >= 0.8) [✓ PASS]
+2025-12-17 08:02:11,853 - credit_prediction.fairness - INFO - Statistical Parity Diff: 0.0762 (target < 0.05) [✗ FAIL]
+2025-12-17 08:02:11,853 - credit_prediction.fairness - INFO - Equalized Odds Diff: 0.2143 (target < 0.1) [✗ FAIL]
+2025-12-17 08:02:11,853 - credit_prediction.fairness - INFO - 
+Group Metrics:
+2025-12-17 08:02:11,853 - credit_prediction.fairness - INFO -   Privileged accuracy: 0.6000, positive rate: 0.6000
+2025-12-17 08:02:11,854 - credit_prediction.fairness - INFO -   Unprivileged accuracy: 0.5333, positive rate: 0.6762
+2025-12-17 08:02:11,854 - credit_prediction.fairness - INFO - ============================================================
+
+2025-12-17 08:02:11,855 - credit_prediction.fairness - INFO - 
+============================================================
+2025-12-17 08:02:11,856 - credit_prediction.fairness - INFO - Fairness Metrics (After Adjustment)
+2025-12-17 08:02:11,856 - credit_prediction.fairness - INFO - ============================================================
+2025-12-17 08:02:11,856 - credit_prediction.fairness - INFO - Disparate Impact Ratio: 1.2222 (target >= 0.8) [✓ PASS]
+2025-12-17 08:02:11,856 - credit_prediction.fairness - INFO - Statistical Parity Diff: 0.1333 (target < 0.05) [✗ FAIL]
+2025-12-17 08:02:11,856 - credit_prediction.fairness - INFO - Equalized Odds Diff: 0.2429 (target < 0.1) [✗ FAIL]
+2025-12-17 08:02:11,856 - credit_prediction.fairness - INFO - 
+Group Metrics:
+2025-12-17 08:02:11,856 - credit_prediction.fairness - INFO -   Privileged accuracy: 0.6000, positive rate: 0.6000
+2025-12-17 08:02:11,856 - credit_prediction.fairness - INFO -   Unprivileged accuracy: 0.5714, positive rate: 0.7333
+2025-12-17 08:02:11,856 - credit_prediction.fairness - INFO - ============================================================
+
+2025-12-17 08:02:11,856 - credit_prediction - WARNING - ✗ Some fairness targets not met: ['statistical_parity_difference', 'equalized_odds_difference']
+2025-12-17 08:02:11,856 - credit_prediction - INFO - 
+[STEP 8] Generating explanations...
+2025-12-17 08:02:11,865 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 08:02:11,875 - credit_prediction.explainability - INFO - SHAP values calculated for 200 samples
+2025-12-17 08:02:12,389 - credit_prediction.explainability - INFO - Global feature importance plot saved to reports/figures/feature_importance_shap.png
+2025-12-17 08:02:12,589 - credit_prediction.explainability - INFO - Detailed SHAP plot saved to reports/figures/feature_importance_detailed.png
+2025-12-17 08:02:12,589 - credit_prediction.utils - INFO - Random seed set to 42
+2025-12-17 08:02:12,597 - credit_prediction.explainability - INFO - SHAP values calculated for 200 samples
+2025-12-17 08:02:12,601 - credit_prediction.explainability - INFO - Generated 5 explanations in explanations
+2025-12-17 08:02:12,601 - credit_prediction - INFO - 
+[STEP 9] Saving artifacts...
+2025-12-17 08:02:12,603 - credit_prediction.model - INFO - Model v20251217_080211 saved to models/credit_model.pkl
+2025-12-17 08:02:12,604 - credit_prediction.preprocessing - INFO - Preprocessor saved to models/preprocessor.pkl
+2025-12-17 08:02:12,604 - credit_prediction - INFO - Metrics saved to outputs/metrics.json
+2025-12-17 08:02:12,604 - credit_prediction - INFO - 
+============================================================
+2025-12-17 08:02:12,604 - credit_prediction - INFO - PIPELINE COMPLETE
+2025-12-17 08:02:12,604 - credit_prediction - INFO - ============================================================
+2025-12-17 08:02:12,604 - credit_prediction - INFO - Model Accuracy: 0.5650
+2025-12-17 08:02:12,604 - credit_prediction - INFO - Disparate Impact: 1.2222
+2025-12-17 08:02:12,604 - credit_prediction - INFO - Statistical Parity Diff: 0.1333
+2025-12-17 08:02:12,604 - credit_prediction - INFO - Equalized Odds Diff: 0.2429
+2025-12-17 08:02:12,604 - credit_prediction - INFO - Explanations generated: 5
+2025-12-17 08:02:12,604 - credit_prediction - INFO - ============================================================
+
+2025-12-17 08:02:12,604 - credit_prediction.cli - INFO - Pipeline completed successfully!
+2025-12-17 08:02:12,604 - credit_prediction.cli - INFO - Trained model saved: models/credit_model.pkl
+2025-12-17 08:02:12,604 - credit_prediction.cli - INFO - Evaluation metrics: {'accuracy': 0.565, 'precision': 0.6640625, 'recall': 0.6589147286821705, 'f1': 0.6614785992217899, 'roc_auc': 0.5514794191505623}
+2025-12-17 09:14:46,564 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:14:46,573 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:14:46,573 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:14:46,574 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:14:46,581 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:14:46,581 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:14:46,581 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:14:46,581 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:14:59,477 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:14:59,478 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:14:59,478 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:14:59,479 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:14:59,496 - credit_prediction.explainability - INFO - SHAP values calculated for 1 samples
+2025-12-17 09:19:15,253 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:19:17,290 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:19:17,299 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:19:17,299 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:19:17,299 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:19:17,306 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:19:17,306 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:19:17,307 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:19:17,307 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:19:38,837 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:19:40,507 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:19:40,514 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:19:40,514 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:19:40,515 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:19:40,521 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:19:40,521 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:19:40,522 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:19:40,522 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:19:49,618 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:19:51,130 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:19:51,137 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:19:51,137 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:19:51,138 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:19:51,144 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:19:51,144 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:19:51,144 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:19:51,144 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:20:19,555 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:20:21,003 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:20:21,010 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:20:21,010 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:20:21,011 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:20:21,017 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:20:21,017 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:20:21,017 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:20:21,017 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:20:35,698 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:20:35,700 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:20:35,700 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:20:35,704 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:20:35,723 - credit_prediction.explainability - INFO - SHAP values calculated for 1 samples
+2025-12-17 09:20:43,454 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:20:47,186 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:20:47,193 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:20:47,193 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:20:47,194 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:20:47,201 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:20:47,201 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:20:47,201 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:20:47,201 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:20:55,042 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:20:55,043 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:20:55,043 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:20:55,045 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:20:55,055 - credit_prediction.explainability - INFO - SHAP values calculated for 1 samples
+2025-12-17 09:22:43,342 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:22:45,858 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:22:45,868 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:22:45,868 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:22:45,869 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:22:45,876 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:22:45,876 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:22:45,877 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:22:45,877 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:22:48,404 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:22:51,913 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:22:51,920 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:22:51,920 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:22:51,921 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:22:51,927 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:22:51,927 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:22:51,928 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:22:51,928 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:23:03,864 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:23:03,865 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:23:03,865 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:23:03,866 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:23:03,888 - credit_prediction.explainability - INFO - SHAP values calculated for 1 samples
+2025-12-17 09:24:11,005 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:24:12,858 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:24:12,866 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:24:12,866 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:24:12,867 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:24:12,874 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:24:12,874 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:24:12,875 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:24:12,875 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:24:59,518 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:25:01,031 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:25:01,038 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:25:01,038 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:25:01,039 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:25:01,046 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:25:01,046 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:25:01,046 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:25:01,046 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:25:08,118 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:25:09,589 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:25:09,596 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:25:09,596 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:25:09,597 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:25:09,604 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:25:09,604 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:25:09,604 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:25:09,604 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:25:56,299 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:25:57,799 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:25:57,806 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:25:57,806 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:25:57,807 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:25:57,814 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:25:57,814 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:25:57,814 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:25:57,814 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:26:07,525 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:26:09,005 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:26:09,012 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:26:09,012 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:26:09,013 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:26:09,020 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:26:09,020 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:26:09,020 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:26:09,020 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:26:20,869 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:26:24,330 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:26:24,336 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:26:24,337 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:26:24,337 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:26:24,344 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:26:24,344 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:26:24,344 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:26:24,344 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:26:34,196 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:26:34,197 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:26:34,198 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:26:34,200 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:26:34,218 - credit_prediction.explainability - INFO - SHAP values calculated for 1 samples
+2025-12-17 09:29:09,925 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:29:11,513 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:29:11,520 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:29:11,521 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:29:11,521 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:29:11,528 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:29:11,528 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:29:11,528 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:29:11,528 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:29:20,735 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:29:22,454 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:29:22,461 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:29:22,461 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:29:22,462 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:29:22,509 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:29:22,509 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:29:22,509 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:29:22,509 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:29:54,542 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:29:56,106 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:29:56,113 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:29:56,113 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:29:56,114 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:29:56,121 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:29:56,121 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:29:56,121 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:29:56,121 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:30:05,421 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:30:17,569 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:30:17,576 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:30:17,576 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:30:17,577 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:30:17,583 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:30:17,583 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:30:17,583 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:30:17,583 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:31:15,388 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:31:18,909 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:31:18,916 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:31:18,916 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:31:18,917 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:31:18,923 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:31:18,923 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:31:18,924 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:31:18,924 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:31:26,238 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:31:26,239 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:31:26,239 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:31:26,241 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:31:26,252 - credit_prediction.explainability - INFO - SHAP values calculated for 1 samples
+2025-12-17 09:35:04,519 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:35:06,036 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:35:06,043 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:35:06,043 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:35:06,043 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:35:06,050 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:35:06,050 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:35:06,050 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:35:06,050 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:36:15,794 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:36:18,030 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:36:18,039 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:36:18,039 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:36:18,040 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:36:18,048 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:36:18,048 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:36:18,048 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:36:18,048 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:36:21,990 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:36:23,506 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:36:23,513 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:36:23,513 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:36:23,514 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:36:23,521 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:36:23,521 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:36:23,521 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:36:23,521 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:36:29,584 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:36:33,605 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:36:33,612 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:36:33,612 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:36:33,613 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:36:33,619 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:36:33,619 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:36:33,620 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:36:33,620 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:36:42,516 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:36:42,520 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:36:42,521 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:36:42,523 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:36:42,551 - credit_prediction.explainability - INFO - SHAP values calculated for 1 samples
+2025-12-17 09:39:02,333 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:39:02,335 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:39:02,335 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:39:02,336 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:40:00,354 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:40:00,355 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:40:00,355 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:40:00,356 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:41:27,805 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:41:29,544 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:41:29,551 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:41:29,551 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:41:29,552 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:41:29,559 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:41:29,559 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:41:29,559 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:41:29,559 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:41:38,051 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:41:39,596 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:41:39,603 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:41:39,603 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:41:39,604 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:41:39,611 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:41:39,611 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:41:39,611 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:41:39,611 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:41:59,531 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:42:01,170 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:42:01,177 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:42:01,177 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:42:01,178 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:42:01,185 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:42:01,185 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:42:01,186 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:42:01,186 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:42:08,562 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:42:12,240 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:42:12,247 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:42:12,247 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:42:12,248 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:42:12,254 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:42:12,255 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:42:12,255 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:42:12,255 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:42:28,538 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:42:28,540 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:42:28,541 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:42:28,542 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:42:28,566 - credit_prediction.explainability - INFO - SHAP values calculated for 1 samples
+2025-12-17 09:45:16,317 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:45:16,319 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:45:16,319 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:45:16,320 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:45:47,349 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:45:47,350 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:45:47,351 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:45:47,352 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:50:57,315 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:50:59,391 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:50:59,399 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:50:59,399 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:50:59,400 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:50:59,407 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:50:59,407 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:50:59,407 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:50:59,407 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:51:53,178 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:51:54,734 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:51:54,741 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:51:54,741 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:51:54,742 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:51:54,748 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:51:54,748 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:51:54,748 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:51:54,748 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:52:25,667 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:52:27,237 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:52:27,244 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:52:27,244 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:52:27,245 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:52:27,252 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:52:27,252 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:52:27,252 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:52:27,252 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:52:43,546 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:52:43,548 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:52:43,549 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:52:43,553 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:52:43,569 - credit_prediction.explainability - INFO - SHAP values calculated for 1 samples
+2025-12-17 09:53:51,667 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:53:53,769 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:53:53,776 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:53:53,776 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:53:53,777 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:53:53,783 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:53:53,783 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:53:53,784 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:53:53,784 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:54:20,634 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:54:20,637 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:54:20,638 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:54:20,639 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:54:20,661 - credit_prediction.explainability - INFO - SHAP values calculated for 1 samples
+2025-12-17 09:54:20,661 - credit_prediction - ERROR - Prediction error: "PredictionResponse" object has no field "narrative_explanation"
+2025-12-17 09:54:50,078 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:54:52,258 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:54:52,266 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:54:52,266 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:54:52,267 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:54:52,273 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:54:52,274 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:54:52,274 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:54:52,274 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:54:53,062 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:54:53,063 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:54:53,063 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:54:53,064 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:54:53,073 - credit_prediction.explainability - INFO - SHAP values calculated for 1 samples
+2025-12-17 09:56:48,513 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:56:50,061 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:56:50,068 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:56:50,068 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:56:50,068 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:56:50,075 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:56:50,075 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:56:50,075 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:56:50,075 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:57:28,984 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:57:30,512 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:57:30,520 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:57:30,520 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:57:30,520 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:57:30,527 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:57:30,527 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:57:30,527 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:57:30,527 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:58:17,742 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 09:58:19,376 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:58:19,383 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:58:19,384 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:58:19,384 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:58:19,391 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 09:58:19,391 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 09:58:19,391 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:58:19,391 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 09:58:30,542 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 09:58:30,544 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 09:58:30,545 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 09:58:30,546 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 09:58:30,560 - credit_prediction.explainability - INFO - SHAP values calculated for 1 samples
+2025-12-17 10:05:08,185 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 10:05:10,577 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:05:10,585 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:05:10,585 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:05:10,586 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:05:10,593 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:05:10,593 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:05:10,593 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:05:10,593 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:05:35,461 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 10:05:37,073 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:05:37,080 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:05:37,080 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:05:37,081 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:05:37,087 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:05:37,087 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:05:37,088 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:05:37,088 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:06:32,888 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 10:06:35,218 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:06:35,232 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:06:35,232 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:06:35,240 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:06:35,249 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:06:35,249 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:06:35,249 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:06:35,249 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:06:42,640 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 10:06:44,611 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:06:44,621 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:06:44,621 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:06:44,622 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:06:44,629 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:06:44,629 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:06:44,629 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:06:44,629 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:06:46,957 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 10:06:50,173 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:06:50,180 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:06:50,180 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:06:50,181 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:06:50,188 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:06:50,188 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:06:50,191 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:06:50,191 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:07:13,140 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 10:07:15,052 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:07:15,062 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:07:15,062 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:07:15,063 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:07:15,070 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:07:15,070 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:07:15,070 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:07:15,070 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:07:21,035 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 10:07:24,527 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:07:24,534 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:07:24,534 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:07:24,535 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:07:24,542 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:07:24,542 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:07:24,542 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:07:24,542 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:08:15,682 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 10:08:17,204 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:17,211 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:08:17,211 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:17,212 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:17,219 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:08:17,219 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:17,219 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:08:17,219 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:08:29,454 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 10:08:30,924 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:30,931 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:08:30,931 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:30,932 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:30,939 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:08:30,939 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:30,939 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:08:30,939 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:08:51,164 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 10:08:52,694 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:52,702 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:08:52,702 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:52,703 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:52,709 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:08:52,709 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:52,709 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:08:52,709 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:08:55,032 - credit_prediction - INFO - A/B testing disabled. Using single model mode.
+2025-12-17 10:08:57,843 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:57,850 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:08:57,850 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:57,852 - credit_prediction.model - INFO - Model v20251217_080211 loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:57,859 - credit_prediction.explainability - INFO - SHAP TreeExplainer initialized
+2025-12-17 10:08:57,859 - credit_prediction - INFO - Model loaded from /Users/aleya/credprediction/models/credit_model.pkl
+2025-12-17 10:08:57,859 - credit_prediction.preprocessing - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:08:57,859 - credit_prediction - INFO - Preprocessor loaded from models/preprocessor.pkl
+2025-12-17 10:09:13,837 - credit_prediction.preprocessing - INFO - Converted 7 columns to numeric
+2025-12-17 10:09:13,840 - credit_prediction.preprocessing - INFO - Created Debt_to_Income feature
+2025-12-17 10:09:13,840 - credit_prediction.preprocessing - INFO - Created Loan_to_Income feature
+2025-12-17 10:09:13,844 - credit_prediction.preprocessing - INFO - CDI calculated: 1/1 (100.0%) classified as disadvantaged (threshold >= 2)
+2025-12-17 10:09:13,863 - credit_prediction.explainability - INFO - SHAP values calculated for 1 samples

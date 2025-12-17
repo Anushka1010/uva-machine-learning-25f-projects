@@ -1,0 +1,60 @@
+{
+  "requested_models": [
+    "xgboost",
+    "rf",
+    "lr"
+  ],
+  "metrics": [
+    "roc_auc",
+    "f1",
+    "accuracy"
+  ],
+  "ranking_metric": "roc_auc",
+  "results": [
+    {
+      "model_key": "xgboost",
+      "model_name": "XGBoost",
+      "metrics": {
+        "roc_auc": 0.5514794191505623,
+        "f1": 0.6614785992217899,
+        "accuracy": 0.565
+      },
+      "training_time_seconds": 0.08985012513585389,
+      "used_sample_weights": true,
+      "probabilities_available": true
+    },
+    {
+      "model_key": "rf",
+      "model_name": "Random Forest",
+      "metrics": {
+        "roc_auc": 0.6135495141390981,
+        "f1": 0.7375886524822695,
+        "accuracy": 0.63
+      },
+      "training_time_seconds": 0.3228171248920262,
+      "used_sample_weights": true,
+      "probabilities_available": true
+    },
+    {
+      "model_key": "lr",
+      "model_name": "Logistic Regression",
+      "metrics": {
+        "roc_auc": 0.6145867452778688,
+        "f1": 0.6320346320346321,
+        "accuracy": 0.575
+      },
+      "training_time_seconds": 0.16112616704776883,
+      "used_sample_weights": true,
+      "probabilities_available": true
+    }
+  ],
+  "best_model": {
+    "model_key": "lr",
+    "model_name": "Logistic Regression",
+    "metrics": {
+      "roc_auc": 0.6145867452778688,
+      "f1": 0.6320346320346321,
+      "accuracy": 0.575
+    }
+  }
+}

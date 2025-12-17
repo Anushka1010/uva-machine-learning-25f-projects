@@ -1,0 +1,281 @@
+{
+  "dashboard": {
+    "title": "Credit Model - Data Quality",
+    "tags": ["credit", "data", "quality"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 0,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Overall Data Quality Score",
+        "type": "gauge",
+        "gridPos": {"h": 10, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "data_quality_score",
+            "refId": "A",
+            "legendFormat": "Quality Score"
+          }
+        ],
+        "description": "Overall data quality score (0-100). Calculated based on validation issues, missing values, and unseen categories.",
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 60, "color": "yellow"},
+                {"value": 80, "color": "green"}
+              ]
+            },
+            "min": 0,
+            "max": 100,
+            "unit": "short"
+          }
+        },
+        "options": {
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        }
+      },
+      {
+        "id": 2,
+        "title": "Missing Values (Recent)",
+        "type": "stat",
+        "gridPos": {"h": 5, "w": 6, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "data_quality_missing_values_total",
+            "refId": "A",
+            "legendFormat": "Missing Values"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 10, "color": "yellow"},
+                {"value": 50, "color": "red"}
+              ]
+            },
+            "unit": "short"
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area"
+        }
+      },
+      {
+        "id": 3,
+        "title": "Validation Issues Rate",
+        "type": "stat",
+        "gridPos": {"h": 5, "w": 6, "x": 18, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(data_quality_validation_issues_total[5m])",
+            "refId": "A",
+            "legendFormat": "Issues/sec"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 0.1, "color": "yellow"},
+                {"value": 1, "color": "red"}
+              ]
+            },
+            "unit": "ops"
+          }
+        },
+        "options": {
+          "colorMode": "background"
+        },
+        "alert": {
+          "conditions": [
+            {
+              "evaluator": {"params": [0.5], "type": "gt"},
+              "operator": {"type": "and"},
+              "query": {"params": ["A", "5m", "now"]},
+              "reducer": {"params": [], "type": "avg"},
+              "type": "query"
+            }
+          ],
+          "executionErrorState": "alerting",
+          "frequency": "60s",
+          "handler": 1,
+          "name": "High Data Quality Issues",
+          "noDataState": "no_data",
+          "notifications": []
+        }
+      },
+      {
+        "id": 4,
+        "title": "Unseen Categories Rate",
+        "type": "stat",
+        "gridPos": {"h": 5, "w": 6, "x": 12, "y": 5},
+        "targets": [
+          {
+            "expr": "rate(data_quality_unseen_categories_total[5m])",
+            "refId": "A",
+            "legendFormat": "Unseen/sec"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 0.01, "color": "yellow"},
+                {"value": 0.1, "color": "red"}
+              ]
+            },
+            "unit": "ops"
+          }
+        },
+        "options": {
+          "colorMode": "value"
+        }
+      },
+      {
+        "id": 5,
+        "title": "Data Quality Score Over Time",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 10},
+        "targets": [
+          {
+            "expr": "data_quality_score",
+            "refId": "A",
+            "legendFormat": "Quality Score"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "logBase": 1, "min": 0, "max": 100},
+          {"format": "short", "logBase": 1}
+        ],
+        "legend": {
+          "show": true,
+          "alignAsTable": true,
+          "avg": true,
+          "current": true,
+          "max": true,
+          "min": true
+        },
+        "thresholds": [
+          {"value": 60, "colorMode": "critical", "op": "lt", "fill": true, "line": true},
+          {"value": 80, "colorMode": "custom", "fillColor": "rgba(255, 255, 0, 0.2)", "op": "lt"}
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Validation Issues by Type",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 18},
+        "targets": [
+          {
+            "expr": "rate(data_quality_validation_issues_total[5m])",
+            "refId": "A",
+            "legendFormat": "{{issue_type}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "ops", "logBase": 1},
+          {"format": "short", "logBase": 1}
+        ],
+        "legend": {
+          "show": true,
+          "alignAsTable": true,
+          "avg": true,
+          "current": true
+        },
+        "stack": true
+      },
+      {
+        "id": 7,
+        "title": "Unseen Categories by Column",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 18},
+        "targets": [
+          {
+            "expr": "rate(data_quality_unseen_categories_total[5m])",
+            "refId": "A",
+            "legendFormat": "{{column}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "ops", "logBase": 1},
+          {"format": "short", "logBase": 1}
+        ],
+        "legend": {
+          "show": true,
+          "alignAsTable": true,
+          "avg": true,
+          "current": true,
+          "max": true
+        }
+      },
+      {
+        "id": 8,
+        "title": "Missing Values Trend",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 26},
+        "targets": [
+          {
+            "expr": "data_quality_missing_values_total",
+            "refId": "A",
+            "legendFormat": "Missing Values"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "logBase": 1, "min": 0},
+          {"format": "short", "logBase": 1}
+        ],
+        "legend": {
+          "show": true
+        }
+      },
+      {
+        "id": 9,
+        "title": "Data Quality Issues Summary",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 26},
+        "targets": [
+          {
+            "expr": "sum by (issue_type) (data_quality_validation_issues_total)",
+            "refId": "A",
+            "format": "table",
+            "instant": true
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "renameByName": {
+                "issue_type": "Issue Type",
+                "Value": "Total Count"
+              }
+            }
+          }
+        ],
+        "options": {
+          "showHeader": true,
+          "sortBy": [
+            {
+              "displayName": "Total Count",
+              "desc": true
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
