@@ -1,0 +1,15 @@
+# Dataset Information
+
+Due to GitHub's file size limitations, the raw image data is hosted on Kaggle.
+
+### Data Link
+[Click here to access the dataset on Kaggle]
+https://www.kaggle.com/datasets/apalla/drunk-vs-sober-facial-frames
+
+### Structure
+The dataset contains two main directories:
+* `frames_drunk/`: Images of subjects under the influence.
+* `frames_sober/`: Images of sober subjects.
+
+### How to use
+To run the notebook in `src/`, download the dataset from the link above and place the two folders directly into the `data/` directory of this project.
