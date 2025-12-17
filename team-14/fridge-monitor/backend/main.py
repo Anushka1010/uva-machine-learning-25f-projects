@@ -2,7 +2,7 @@
 import cv2
 
 # for database and ai
-from api import connect_mongo, connect_gemini, query, add_entry, analyze_photo, get_drive_creds, get_drive_files, get_drive_file_url_and_set_permission, upload_photo_to_drive
+from api import connect_mongo, connect_gemini, query, add_entry, analyze_photo, get_drive_creds, get_drive_files, get_drive_file_url_and_set_permission, upload_photo_to_drive, CNN, load_model, analyze_photo_pytorch
 import time
 from datetime import datetime, timezone
 
@@ -13,7 +13,6 @@ load_dotenv()
 
 # constants
 URI = os.getenv('URI')
-GEMINI_KEY = os.getenv('GEMINI_KEY')
 DB_NAME = os.getenv('DB_NAME')
 COL_NAME = os.getenv('COL_NAME')
 DRIVE_FOLDER_ID = os.getenv('DRIVE_FOLDER_ID')
@@ -22,14 +21,14 @@ if __name__ == "__main__":
     # connect to mongo client 
     mongo_client = connect_mongo(URI)
 
-    # connect to gemini client
-    gemini_client = connect_gemini(GEMINI_KEY)
+    # init model
+    model = load_model()
 
     # get drive credentials
     creds = get_drive_creds()
 
     # camera stuff
-    cam = cv2.VideoCapture(1)
+    cam = cv2.VideoCapture(0)
 
     while True:
         ret, frame = cam.read()
@@ -45,8 +44,7 @@ if __name__ == "__main__":
             image_bytes = cv2.imencode('.jpg', frame)[1].tobytes()
 
             # send photo to gemini
-            #food_name = analyze_photo(gemini_client, image_bytes, "Identify the food item in this image. Give only the name and no other text.")
-            food_name = "Mac and cheese"
+            food_name = analyze_photo_pytorch(model, image_bytes)
 
             # save photo to Google Drive
             filename = f"{food_name.replace(' ', '_').lower()}_{time.strftime('%Y%m%d_%H%M%S')}.jpg"

@@ -15,5 +15,3 @@ The dataset is managed through Roboflow and accessed via API during model traini
 
 ## Data Access
 Since we access the data directly through Roboflow via API, please contact us if you would like the key to replicate the model training.
-
-The data is also located in a zip file under the `data/` directory. However, it is not integrated into the actual model training code.

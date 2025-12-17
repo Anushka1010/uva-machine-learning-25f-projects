@@ -16,6 +16,14 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseUpload
 
+# pytorch imports
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torchvision import transforms
+from PIL import Image
+import io
+
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 # method to connect to client
@@ -161,3 +169,91 @@ def upload_photo_to_drive(creds: Credentials, image_bytes: bytes, file_name: str
     except HttpError as error:
         print(f"An error occurred: {error}")
         return None
+    
+# pytorch code
+
+# pytorch model setup
+CLASSES = [
+    "asian pear",
+    "cucumber",
+    "eggs",
+    'hand',
+    "leafy green",
+    "leftovers",
+    "orange",
+    "sauce",
+    "soda",
+    "tomato"
+]
+
+MODEL_PATH = '../model/fridge_model_complete.pth' # path to .pth
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# architecture
+class CNN(nn.Module):
+    def __init__(self, num_classes):
+        super(CNN, self).__init__()
+        self.conv1 = nn.Conv2d(3, 32, 4, 1, 1)
+        self.conv2 = nn.Conv2d(32, 128, 4, 1, 1)
+        self.conv3 = nn.Conv2d(128, 256, 4, 1, 1)
+        
+        self.pool1 = nn.MaxPool2d(2, 2)
+        self.pool2 = nn.MaxPool2d(2, 2)
+        self.dropout = nn.Dropout(0.5) 
+        
+        self.fc1 = nn.Linear(256 * 7 * 7, 512)
+        self.fc2 = nn.Linear(512, num_classes)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        x = F.relu(self.conv2(x))
+        x = self.pool1(x)
+        x = F.relu(self.conv3(x))
+        x = self.pool2(x)
+        x = x.view(-1, 256 * 7 * 7)
+        x = F.relu(self.fc1(x))
+        x = self.dropout(x)
+        logits = self.fc2(x)
+        return logits
+
+# load model
+def load_model():
+    model = torch.load(MODEL_PATH, map_location=DEVICE, weights_only=False)
+    model.to(DEVICE)
+    model.eval()
+
+    return model
+
+def analyze_photo_pytorch(model, image_bytes: bytes):
+    """Predicts class using the loaded PyTorch model."""
+    # validation transform
+    transform = transforms.Compose([
+        transforms.Resize((32, 32)),
+        transforms.ToTensor(),
+        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+    ])
+
+    if model is None:
+        return "Model Error"
+    
+    try:
+        # convert bytes to PIL Image
+        image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+        
+        # apply transforms
+        img_tensor = transform(image).unsqueeze(0).to(DEVICE)
+        
+        # inference
+        with torch.no_grad():
+            outputs = model(img_tensor)
+            _, predicted = torch.max(outputs, 1)
+            
+        class_idx = predicted.item()
+        if 0 <= class_idx < len(CLASSES):
+            return CLASSES[class_idx]
+        else:
+            return f"Unknown Class ({class_idx})"
+            
+    except Exception as e:
+        print(f"Inference error: {e}")
+        return "Analysis Failed"
