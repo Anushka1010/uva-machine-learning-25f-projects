@@ -1,4 +1,4 @@
-# Microprogram Code_Generation、
+# Microprogram Code_Generation
 # Team 18: Yingming Ma
 
 Writing microprograms is a challenging yet essential task in hardware research areas such as processing-in-memory (PIM). Fully exploring a design space often requires developing a large number of microprograms to cover different hardware configurations and architectural variations. This project serves as a preliminary exploration of the potential for leveraging modern large language models (LLMs) to offload part of this microprogram generation process.

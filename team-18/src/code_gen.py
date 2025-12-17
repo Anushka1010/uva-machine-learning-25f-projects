@@ -17,34 +17,46 @@ def save_json(obj: Dict[str, Any], path: str) -> None:
 
 
 def build_prompt(db: Dict[str, Any]) -> str:
-    # NOTE: must escape braces inside f-strings using {{ and }}.
+    # Keep examples small to avoid huge prompts; adjust as needed.
+    examples_db = db.get("examples_db", [])
+
+    # Option A: include the full examples_db (simple, but can get large)
+    examples_block = json.dumps(examples_db, indent=2)
+
+    # Option B (recommended later): include only the relevant bits / a few examples
+    # For now, assume your examples_db is small enough.
+
     return f"""
 Output ONLY valid JSON.
 
 JSON FORMAT:
 {{
-  \"verifier_input\": {{
-    \"program\": [
-      {{ \"step\": 1, \"instr\": \"ReadRowToSa(dram_row=ROW10)\" }}
+  "verifier_input": {{
+    "program": [
+      {{ "step": 1, "op": "ReadRowToSa", "args": {{ "dram_row": "ROW10" }} }}
     ],
-    \"io\": {{
-      \"input_rows\": [\"ROW10\", \"ROW11\"],
-      \"output_row\": \"ROW12\",
-      \"bitwidth\": 32
+    "io": {{
+      "input_rows": ["ROW10", "ROW11"],
+      "output_row": "ROW12",
+      "bitwidth": 32
     }}
   }},
-  \"reasoning_summary\": [
-    \"Short bullet-point explanation of the correction.\"
+  "reasoning_summary": [
+    "Short bullet-point explanation of the correction."
   ]
 }}
 
 RULES:
 - Output must be strictly valid JSON (no markdown, no extra text).
-- verifier_input.program must contain ONLY fields needed for verification.
+- verifier_input.program must contain ONLY fields needed for verification (step/op/args). Do NOT include comments.
 - reasoning_summary must be concise, high-level, and must NOT include internal chain-of-thought.
 - Use only operations in query.isa.operations and respect query.architecture rules.
+- Follow the patterns shown in EXAMPLES (register usage, swapping, data movement rules).
 
-QUERY:
+EXAMPLES (reference microprograms; do not copy blindly—adapt to the query):
+{examples_block}
+
+QUERY (produce a corrected program for this item):
 {json.dumps(db["query"], indent=2)}
 """.strip()
 
@@ -55,7 +67,7 @@ def api_call(
     model: str = "gpt-4o-mini",
 ) -> Dict[str, Any]:
     """Call the model, parse JSON output, save to file, return parsed object."""
-    client = OpenAI(api_key = "your op AI key")
+    client = OpenAI(api_key = "your_api_key_here")
 
     db = load_json(input_json_path)
     prompt = build_prompt(db)

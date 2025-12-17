@@ -1,12 +1,15 @@
-"""verifier.py
+"""
+verifier.py
 
 Lightweight verifier/simulator for PIM microprogram format.
 
-Program format expected:
-  program = [
-    {"step": 1, "instr": "ReadRowToSa(dram_row=ROW10)"},
-    ...
-  ]
+Accepted program formats (either one):
+
+1) String-based (legacy):
+   {"step": 1, "instr": "ReadRowToSa(dram_row=ROW10)"}
+
+2) Structured (LLM-friendly):
+   {"step": 1, "op": "ReadRowToSa", "args": {"dram_row": "ROW10"}}
 
 Supported ops:
   - ReadRowToSa(dram_row=ROWx)   : DRAM[row] -> RR0
@@ -25,11 +28,16 @@ from typing import Any, Dict, List, Tuple
 MASK32 = 0xFFFFFFFF
 
 
+# -------------------------------------------------
+# Instruction parsing helpers
+# -------------------------------------------------
+
 def parse_instr(instr: str) -> Tuple[str, Dict[str, Any]]:
-    """Parse "OP(k=v,...)" strings into (op, args)."""
+    """Parse 'OP(k=v,...)' strings into (op, args)."""
     m = re.fullmatch(r"\s*([A-Za-z_][A-Za-z0-9_]*)\s*\(\s*(.*?)\s*\)\s*", instr)
     if not m:
         raise ValueError(f"Bad instr format: {instr!r}")
+
     op = m.group(1)
     arg_str = m.group(2)
 
@@ -41,8 +49,46 @@ def parse_instr(instr: str) -> Tuple[str, Dict[str, Any]]:
                 raise ValueError(f"Bad arg token (expected k=v): {p!r} in {instr!r}")
             k, v = [x.strip() for x in p.split("=", 1)]
             args[k] = int(v) if re.fullmatch(r"-?\d+", v) else v
+
     return op, args
 
+
+def _args_to_str(args: Dict[str, Any]) -> str:
+    """Convert args dict to canonical k=v string (stable order)."""
+    parts = []
+    for k in sorted(args.keys()):
+        parts.append(f"{k}={args[k]}")
+    return ",".join(parts)
+
+
+def step_to_instr(ins: Dict[str, Any]) -> str:
+    """
+    Convert a program step into canonical instruction string.
+
+    Accepts either:
+      {"step": n, "instr": "..."}
+    or
+      {"step": n, "op": "...", "args": {...}}
+    """
+    if "instr" in ins:
+        return ins["instr"]
+
+    if "op" not in ins:
+        raise KeyError(f"Instruction missing 'instr' or 'op': {ins}")
+
+    op = ins["op"]
+    args = ins.get("args", {}) or {}
+
+    if not isinstance(args, dict):
+        raise TypeError(f"'args' must be a dict, got {type(args)} in {ins}")
+
+    arg_str = _args_to_str(args)
+    return f"{op}({arg_str})" if arg_str else f"{op}()"
+
+
+# -------------------------------------------------
+# Simulator
+# -------------------------------------------------
 
 @dataclass
 class PIMState:
@@ -70,7 +116,10 @@ class PIMSimulator:
     def swap(self, rr_index: int) -> None:
         if not (0 <= rr_index < len(self.state.RR)):
             raise IndexError(f"rr_index out of range: {rr_index}")
-        self.state.RR[0], self.state.RR[rr_index] = self.state.RR[rr_index], self.state.RR[0]
+        self.state.RR[0], self.state.RR[rr_index] = (
+            self.state.RR[rr_index],
+            self.state.RR[0],
+        )
 
     def nor(self) -> None:
         self.state.RR[0] = (~(self.state.RR[0] | self.state.RR[1])) & MASK32
@@ -100,7 +149,7 @@ def run_program(
     sim = PIMSimulator(row_reg_count=row_reg_count, dram_init=dram_init)
 
     for ins in sorted(program, key=lambda x: x["step"]):
-        instr = ins["instr"]
+        instr = step_to_instr(ins)
         if verbose:
             rr = sim.state.RR
             rr_snap = " ".join(f"RR{i}={rr[i]:08X}" for i in range(min(len(rr), 4)))
@@ -109,6 +158,10 @@ def run_program(
 
     return sim.state
 
+
+# -------------------------------------------------
+# Verification logic
+# -------------------------------------------------
 
 def expected_nor32(a: int, b: int) -> int:
     return (~(a | b)) & MASK32
@@ -135,12 +188,17 @@ def verify_from_verifier_input(
     num_tests: int = 20,
     seed: int = 0,
 ) -> Dict[str, Any]:
-    """Generic entrypoint used by code_gen.py.
-
-    Returns a dict like:
-      {"pass": bool, "task": str, "num_tests": int, "first_failure": {...}|None}
     """
+    Generic entrypoint used by code_gen.py.
 
+    Returns:
+      {
+        "pass": bool,
+        "task": str,
+        "num_tests": int,
+        "first_failure": {...} | None
+      }
+    """
     program = verifier_input["program"]
     io = verifier_input.get("io", {})
     input_rows = io.get("input_rows") or []
@@ -151,12 +209,15 @@ def verify_from_verifier_input(
 
     task = (task_name or "").lower()
     if "nor" not in task:
-        raise NotImplementedError(f"Only NOR verification is implemented right now (task={task_name!r})")
+        raise NotImplementedError(
+            f"Only NOR verification is implemented right now (task={task_name!r})"
+        )
 
     rng = random.Random(seed)
     for t in range(1, num_tests + 1):
         A = rng.getrandbits(32)
         B = rng.getrandbits(32)
+
         ok = verify_nor_rows(
             program=program,
             row_reg_count=row_reg_count,
@@ -167,8 +228,14 @@ def verify_from_verifier_input(
             B=B,
             verbose=False,
         )
+
         if not ok:
-            got_state = run_program(program, row_reg_count, {input_rows[0]: A, input_rows[1]: B, output_row: 0}, verbose=False)
+            got_state = run_program(
+                program,
+                row_reg_count,
+                {input_rows[0]: A, input_rows[1]: B, output_row: 0},
+                verbose=False,
+            )
             return {
                 "pass": False,
                 "task": task_name,
@@ -177,9 +244,14 @@ def verify_from_verifier_input(
                     "test": t,
                     "A": f"0x{A:08X}",
                     "B": f"0x{B:08X}",
-                    "expected": f"0x{expected_nor32(A,B):08X}",
+                    "expected": f"0x{expected_nor32(A, B):08X}",
                     "got": f"0x{got_state.DRAM[output_row] & MASK32:08X}",
                 },
             }
 
-    return {"pass": True, "task": task_name, "num_tests": num_tests, "first_failure": None}
+    return {
+        "pass": True,
+        "task": task_name,
+        "num_tests": num_tests,
+        "first_failure": None,
+    }
