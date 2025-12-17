@@ -1,0 +1,62 @@
+{
+  "classes": [
+    "asian pear",
+    "cucumber",
+    "eggs",
+    "hand",
+    "leafy green",
+    "leftovers",
+    "orange",
+    "sauce",
+    "soda",
+    "tomato"
+  ],
+  "num_classes": 10,
+  "label_to_idx": {
+    "asian pear": 0,
+    "cucumber": 1,
+    "eggs": 2,
+    "hand": 3,
+    "leafy green": 4,
+    "leftovers": 5,
+    "orange": 6,
+    "sauce": 7,
+    "soda": 8,
+    "tomato": 9
+  },
+  "idx_to_label": {
+    "0": "asian pear",
+    "1": "cucumber",
+    "2": "eggs",
+    "3": "hand",
+    "4": "leafy green",
+    "5": "leftovers",
+    "6": "orange",
+    "7": "sauce",
+    "8": "soda",
+    "9": "tomato"
+  },
+  "input_size": [
+    32,
+    32
+  ],
+  "mean": [
+    0.485,
+    0.456,
+    0.406
+  ],
+  "std": [
+    0.229,
+    0.224,
+    0.225
+  ],
+  "best_val_acc": 97.29486023444545,
+  "test_acc": 97.33700642791553,
+  "architecture": {
+    "conv1_out": 32,
+    "conv2_out": 128,
+    "conv3_out": 256,
+    "fc1_out": 512,
+    "dropout": 0.5
+  }
+}
