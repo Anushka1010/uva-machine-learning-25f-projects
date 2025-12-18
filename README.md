@@ -6,6 +6,9 @@
 - [machine-learning-uva2019-students-deep2reproduce/](https://github.com/Qdata4Capstone/machine-learning-uva19-students-deep2reproduce/)
 - [machine-learning-uva2020-students-ml for good use](https://github.com/Qdata4Capstone/machine-learning20f-learning4good-projects)
 
+## The course website : [https://qiyanjun.github.io/2025Fall-UVA-CS-MachineLearningDeep/](https://qiyanjun.github.io/2025Fall-UVA-CS-MachineLearningDeep/)
+
+---
 
 ### Index of the students' team projects:  
 | Index | Keywords |
