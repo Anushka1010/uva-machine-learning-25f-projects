@@ -1,6 +1,13 @@
-# uva-machine-learning-25f-projects
+# Students' Final Projects  for 2025 Fall UVa CS -ML-Undergraduate
 
-### Index: 
+---
+
+## Related: Students' projects from this course's past offering in 2020 and 2019
+- [machine-learning-uva2019-students-deep2reproduce/](https://github.com/Qdata4Capstone/machine-learning-uva19-students-deep2reproduce/)
+- [machine-learning-uva2020-students-ml for good use](https://github.com/Qdata4Capstone/machine-learning20f-learning4good-projects)
+
+
+### Index of the students' team projects:  
 | Index | Keywords |
 |-------|----------|
 | t01 | ML_Anomaly |
