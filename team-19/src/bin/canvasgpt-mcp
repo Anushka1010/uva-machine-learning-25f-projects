@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+
+/* CanvasGPT MCP Server Launcher
+   This script can be run from anywhere and will find the server */
+
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+import { spawn } from 'node:child_process';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Server is in ../mcp-server-standalone.ts relative to this file
+const serverPath = join(__dirname, '..', 'mcp-server-standalone.ts');
+const tsxPath = join(__dirname, '..', 'node_modules', '.bin', 'tsx');
+
+console.error(`[CanvasGPT MCP] Starting server from: ${serverPath}`);
+
+// Spawn tsx to run the TypeScript file directly
+const serverProcess = spawn(tsxPath, [serverPath], {
+  stdio: 'inherit',
+  env: process.env
+});
+
+serverProcess.on('error', (error) => {
+  console.error('[CanvasGPT MCP] Failed to start server:', error);
+  process.exit(1);
+});
+
+serverProcess.on('exit', (code) => {
+  process.exit(code || 0);
+});
