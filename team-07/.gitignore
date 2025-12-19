@@ -1,0 +1,34 @@
+# Python virtual environment
+src/backend/venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Node modules
+src/frontend/node_modules/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+
+# Data
+data/uploads/*
+!data/uploads/.gitkeep
+data/vectordb/*
+!data/vectordb/.gitkeep

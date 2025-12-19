@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="nav-offset">
+<div class="container">
+    <div class="chat-container card" style="padding: 0; overflow: hidden;">
+        <!-- Chat Header -->
+        <div class="card-header" style="margin: 0; padding: 1rem 1.5rem; border-radius: 12px 12px 0 0;">
+            <div class="flex items-center gap-2">
+                <div>
+                    <h3 class="card-title">HoosAdvisor</h3>
+                    <p class="text-muted" style="font-size: 0.875rem;">Ask me anything about UVA courses!</p>
+                </div>
+            </div>
+            <form action="/chat/clear" method="post" style="margin: 0;">
+                <input type="hidden" name="session_id" value="{{ session_id }}">
+                <!-- <button type="submit" class="btn btn-ghost btn-sm">🗑️ Clear</button> -->
+            </form>
+        </div>
+        
+        <!-- Chat Messages -->
+        <div class="chat-messages" id="chat-messages">
+            {% if messages %}
+                {% for msg in messages %}
+                <div class="chat-message {{ msg.role }}">
+                    <div class="chat-avatar">
+                        {% if msg.role == 'user' %}👤{% else %}🤖{% endif %}
+                    </div>
+                    <div class="chat-bubble">
+                        {% if msg.role == 'assistant' %}
+                            {{ msg.content | markdown | safe }}
+                        {% else %}
+                            {{ msg.content }}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="chat-empty" id="chat-empty">
+                    <div class="chat-empty-icon">🎓</div>
+                    <h3 class="chat-empty-title">How can I help you today?</h3>
+                    <p class="text-muted">Ask me about courses, prerequisites, professors, or scheduling at UVA.</p>
+                    
+                    <div class="chat-suggestions">
+                        <button type="button" class="suggestion-chip" onclick="setMessage(this.textContent)">What are the required CS courses?</button>
+                        <button type="button" class="suggestion-chip" onclick="setMessage(this.textContent)">Tell me about CS 4774</button>
+                        <button type="button" class="suggestion-chip" onclick="setMessage(this.textContent)">Who teaches Discrete Math 2?</button>
+                        <button type="button" class="suggestion-chip" onclick="setMessage(this.textContent)">What are the prereqs for DSA1?</button>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Chat Input -->
+        <div class="chat-input-container">
+            <form id="chat-form" class="chat-input-form" onsubmit="return sendMessage(event)">
+                <input type="hidden" name="session_id" value="{{ session_id }}">
+                <input 
+                    type="text" 
+                    name="message" 
+                    id="chat-input"
+                    class="chat-input" 
+                    placeholder="Ask about courses, prerequisites, professors..."
+                    required
+                    autofocus
+                >
+                <button type="submit" id="send-btn" class="btn btn-primary">
+                    Send
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+function setMessage(text) {
+    document.getElementById('chat-input').value = text;
+    document.getElementById('chat-input').focus();
+}
+
+document.getElementById('chat-form').onsubmit = function(e) {
+    e.preventDefault();
+    var input = document.getElementById('chat-input');
+    var message = input.value.trim();
+    if (!message) return;
+    
+    // Show user message + loading
+    var empty = document.getElementById('chat-empty');
+    if (empty) empty.remove();
+    
+    var messages = document.getElementById('chat-messages');
+    messages.innerHTML += '<div class="chat-message user"><div class="chat-avatar">👤</div><div class="chat-bubble">' + message + '</div></div>';
+    messages.innerHTML += '<div class="chat-message assistant" id="loading"><div class="chat-avatar">🤖</div><div class="chat-bubble">Thinking... <span class="loader"></span></div></div>';
+    messages.scrollTop = messages.scrollHeight;
+    
+    // Disable input
+    input.disabled = true;
+    document.getElementById('send-btn').disabled = true;
+    
+    // Fetch response
+    var form = new FormData();
+    form.append('message', message);
+    form.append('session_id', '{{ session_id }}');
+    
+    fetch('/chat/api', {method: 'POST', body: form})
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            document.getElementById('loading').remove();
+            messages.innerHTML += '<div class="chat-message assistant"><div class="chat-avatar">🤖</div><div class="chat-bubble md-content">' + data.response + '</div></div>';
+            messages.scrollTop = messages.scrollHeight;
+            input.value = '';
+            input.disabled = false;
+            document.getElementById('send-btn').disabled = false;
+            input.focus();
+        })
+        .catch(function() {
+            document.getElementById('loading').querySelector('.chat-bubble').innerHTML = 'Error. Please try again.';
+            input.disabled = false;
+            document.getElementById('send-btn').disabled = false;
+        });
+};
+
+document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+</script>
+
+<style>
+.loader {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--text-secondary);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+{% endblock %}
+

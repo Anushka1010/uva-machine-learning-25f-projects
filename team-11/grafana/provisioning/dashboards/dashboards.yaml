@@ -1,0 +1,14 @@
+apiVersion: 1
+
+providers:
+  - name: 'Credit Model Dashboards'
+    orgId: 1
+    folder: 'Credit Prediction'
+    type: file
+    disableDeletion: false
+    editable: true
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/dashboards
+      foldersFromFilesStructure: false

@@ -1,0 +1,155 @@
+{
+  "config_path": "default",
+  "data_path": "data/sample_credit_data.csv",
+  "validation_report": {
+    "row_count": 1000,
+    "column_count": 13,
+    "columns": [
+      "Income",
+      "Debt",
+      "Loan_Amount",
+      "Loan_Term",
+      "Num_Credit_Cards",
+      "Credit_Score",
+      "Gender",
+      "Education",
+      "Payment_History",
+      "Employment_Status",
+      "Residence_Type",
+      "Marital_Status",
+      "Creditworthiness"
+    ],
+    "issues": [],
+    "unique_Gender": [
+      "Male",
+      "Female"
+    ],
+    "unique_Education": [
+      "Bachelor's",
+      "High School",
+      "Master's",
+      "PhD"
+    ],
+    "unique_Payment_History": [
+      "Fair",
+      "Excellent",
+      "Good",
+      "Poor"
+    ],
+    "unique_Employment_Status": [
+      "Employed",
+      "Self-Employed",
+      "Unemployed"
+    ],
+    "unique_Residence_Type": [
+      "Rented",
+      "Owned",
+      "Mortgage"
+    ],
+    "unique_Marital_Status": [
+      "Married",
+      "Single",
+      "Divorced"
+    ]
+  },
+  "data_shape": {
+    "train_samples": 800,
+    "test_samples": 200,
+    "num_features": 22
+  },
+  "model_metrics": {
+    "accuracy": 0.565,
+    "precision": 0.6640625,
+    "recall": 0.6589147286821705,
+    "f1": 0.6614785992217899,
+    "roc_auc": 0.5514794191505623
+  },
+  "fairness_metrics": {
+    "before_adjustment": {
+      "disparate_impact": 1.1269841269841272,
+      "statistical_parity_difference": 0.07619047619047625,
+      "equalized_odds_difference": 0.2142857142857143,
+      "average_odds_difference": 0.10520581113801453,
+      "privileged_accuracy": 0.6,
+      "unprivileged_accuracy": 0.5333333333333333,
+      "privileged_positive_rate": 0.6,
+      "unprivileged_positive_rate": 0.6761904761904762,
+      "ppv_parity": 0.036323202372127494,
+      "fnr_parity": 0.0038740920096852483,
+      "fpr_parity": 0.2142857142857143,
+      "tpr_privileged": 0.6610169491525424,
+      "tpr_unprivileged": 0.6571428571428571,
+      "fpr_privileged": 0.5,
+      "fpr_unprivileged": 0.7142857142857143,
+      "privileged_confusion_matrix": [
+        [
+          18,
+          18
+        ],
+        [
+          20,
+          39
+        ]
+      ],
+      "unprivileged_confusion_matrix": [
+        [
+          10,
+          25
+        ],
+        [
+          24,
+          46
+        ]
+      ]
+    },
+    "after_adjustment": {
+      "disparate_impact": 1.222222222222222,
+      "statistical_parity_difference": 0.1333333333333333,
+      "equalized_odds_difference": 0.24285714285714288,
+      "average_odds_difference": 0.15520581113801452,
+      "privileged_accuracy": 0.6,
+      "unprivileged_accuracy": 0.5714285714285714,
+      "privileged_positive_rate": 0.6,
+      "unprivileged_positive_rate": 0.7333333333333333,
+      "ppv_parity": 0.021872863978127155,
+      "fnr_parity": 0.0675544794188862,
+      "fpr_parity": 0.24285714285714288,
+      "tpr_privileged": 0.6610169491525424,
+      "tpr_unprivileged": 0.7285714285714285,
+      "fpr_privileged": 0.5,
+      "fpr_unprivileged": 0.7428571428571429,
+      "privileged_confusion_matrix": [
+        [
+          18,
+          18
+        ],
+        [
+          20,
+          39
+        ]
+      ],
+      "unprivileged_confusion_matrix": [
+        [
+          9,
+          26
+        ],
+        [
+          19,
+          51
+        ]
+      ]
+    }
+  },
+  "fairness_targets_met": {
+    "disparate_impact": true,
+    "statistical_parity_difference": false,
+    "equalized_odds_difference": false
+  },
+  "explanations": {
+    "num_generated": 5,
+    "global_importance_plot": "reports/figures/feature_importance_shap.png",
+    "detailed_plot": "reports/figures/feature_importance_detailed.png"
+  },
+  "model_path": "models/credit_model.pkl",
+  "preprocessor_path": "models/preprocessor.pkl"
+}

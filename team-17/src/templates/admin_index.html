@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="nav-offset">
+    <div class="container" style="max-width: 600px;">
+        <div class="card">
+            <h2 class="mb-3">⚙️ Admin: Index Courses</h2>
+            
+            <p class="text-muted mb-3">
+                This will fetch course data from the SIS API and index it into the vector database for RAG search.
+            </p>
+            
+            {% if success_message %}
+            <div class="alert alert-success mb-3">
+                ✅ {{ success_message }}
+            </div>
+            {% endif %}
+            
+            {% if error_message %}
+            <div class="alert alert-error mb-3">
+                ❌ {{ error_message }}
+            </div>
+            {% endif %}
+            
+            <form action="/admin/index/run" method="post">
+                <p class="text-muted mb-2" style="font-size: 0.875rem;">
+                    <strong>Note:</strong> This process may take a few minutes depending on the number of courses.
+                    Make sure your OpenAI API key is configured in the environment.
+                </p>
+                
+                <button type="submit" class="btn btn-primary">
+                    🚀 Start Indexing
+                </button>
+            </form>
+            
+            <hr style="border-color: var(--border-color); margin: 2rem 0;">
+            
+            <h4 class="mb-2">📊 Subjects to Index</h4>
+            <ul style="color: var(--text-muted); font-size: 0.9rem;">
+                <li>CS - Computer Science</li>
+                <li>DS - Data Science</li>
+                <li>STAT - Statistics</li>
+                <li>MATH - Mathematics</li>
+                <li>STS - Science, Technology & Society</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

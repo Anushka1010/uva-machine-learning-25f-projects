@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title | default("HoosAdvisor") }}</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Bodoni:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="/" class="nav-brand">
+                    <span class="brand-icon">🎓</span>
+                    <div class="bodoni-italic" style="font-size: 1.5rem;">HoosAdvisor</div>
+                </a>
+                
+                <ul class="nav-links">
+                    <li>
+                        <a href="/chat" class="nav-link {% if request.url.path.startswith('/chat') %}active{% endif %}">
+                            Chat
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/courses" class="nav-link {% if request.url.path.startswith('/courses') %}active{% endif %}">
+                            Courses
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/schedule" class="nav-link {% if request.url.path.startswith('/schedule') %}active{% endif %}">
+                            Schedule
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p class="footer-text">
+                    CS 4774 Final Project • 
+                    <span class="footer-link">HoosAdvisor</span>
+                     • Made with 🧡 by Hoos
+                </p>
+            </div>
+        </footer>
+    </div>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>
+

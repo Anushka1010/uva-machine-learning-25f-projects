@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container hero-content">
+        <h1 class="hero-title">Your UVA AI</h1>
+        <div class="hero-title bodoni-italic" style="font-size: 5rem;">Academic Advisor</div>
+        <p class="hero-subtitle">
+            Get personalized course recommendations, build your schedule, and plan your academic journey at UVA, all in one place.
+        </p>
+        <div class="hero-actions">
+            <a href="/chat" class="btn btn-primary">
+                Start Chatting
+            </a>
+            <a href="/courses" class="btn btn-secondary">
+                Browse Courses
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="container">
+        <div class="features-grid">
+            <!-- Chat Feature -->
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h3 class="feature-title">AI Chat Assistant</h3>
+                <p class="feature-desc">
+                    Ask questions about courses, prerequisites, professors, and get instant, accurate answers powered by RAG.
+                </p>
+            </div>
+            
+            <!-- Course Search -->
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3 class="feature-title">Course Search</h3>
+                <p class="feature-desc">
+                    Search and browse UVA courses by subject, keyword, or instructor. View detailed course information.
+                </p>
+            </div>
+            
+            <!-- Schedule Builder -->
+            <div class="feature-card">
+                <div class="feature-icon">📅</div>
+                <h3 class="feature-title">Schedule Builder</h3>
+                <p class="feature-desc">
+                    Build and visualize your class schedule. Easily compare different options and check for conflicts.
+                </p>
+            </div>
+            
+            <!-- Recommendations -->
+            <div class="feature-card">
+                <div class="feature-icon">✨</div>
+                <h3 class="feature-title">Smart Recommendations</h3>
+                <p class="feature-desc">
+                    Get personalized course suggestions based on your interests, major requirements, and past courses.
+                </p>
+            </div>
+            
+            <!-- Prerequisites -->
+            <div class="feature-card">
+                <div class="feature-icon">🌳</div>
+                <h3 class="feature-title">Prerequisite Tracking</h3>
+                <p class="feature-desc">
+                    Understand course dependencies and plan your path through required courses efficiently.
+                </p>
+            </div>
+            
+            <!-- 24/7 Access -->
+            <div class="feature-card">
+                <div class="feature-icon">🕐</div>
+                <h3 class="feature-title">24/7 Availability</h3>
+                <p class="feature-desc">
+                    Access advising help anytime, anywhere. No appointments needed — just ask your question.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Data Sources Section -->
+<section class="features" style="background: var(--bg-secondary); padding: 3rem 0; margin-top: 2rem;">
+    <div class="container">
+        <div class="text-center mb-4 bodoni-italic" style="font-size: 2.5rem;">Powered By Real Data</div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">SIS API</h3>
+                <p class="feature-desc">
+                    Live course data, sections, enrollment, and schedules from UVA's Student Information System.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⭐</div>
+                <h3 class="feature-title">TheCourseForum + RateMyProfessor</h3>
+                <p class="feature-desc">
+                    Professor ratings and reviews to help you choose the best instructors.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <h3 class="feature-title">HoosList</h3>
+                <p class="feature-desc">
+                    Data-driven views of course offerings, schedules, and historical enrollment information.
+                </p>
+            </div>
+    </div>
+</section>
+{% endblock %}
+

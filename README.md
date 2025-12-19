@@ -1,4 +1,53 @@
-# uva-machine-learning-25f-projects
+# Students' Final Projects  for 2025 Fall UVa CS -ML-Undergraduate
+
+---
+
+## Related: Students' projects from this course's past offering in 2020 and 2019
+- [machine-learning-uva2019-students-deep2reproduce/](https://github.com/Qdata4Capstone/machine-learning-uva19-students-deep2reproduce/)
+- [machine-learning-uva2020-students-ml for good use](https://github.com/Qdata4Capstone/machine-learning20f-learning4good-projects)
+
+## The course website : [https://qiyanjun.github.io/2025Fall-UVA-CS-MachineLearningDeep/](https://qiyanjun.github.io/2025Fall-UVA-CS-MachineLearningDeep/)
+
+---
+
+### Index of the students' team projects:  
+| Index | Keywords |
+|-------|----------|
+| t01 | ML_Anomaly |
+| t02 | ML_YoloTrash |
+| t03 | ML_gradCam |
+| t04 | ML_soccerplayer |
+| t05 | Human-In-the-LoopRL-ImageSynth |
+| t06 | DiabetesForecasting |
+| t07 | Local-RAG-Vector-Search-System |
+| t08 | Autodifferentiation |
+| t09 | ChessElo |
+| t10 | MarketMinds-Headlines-to-Returns |
+| t11 | FairCreditPredictionML |
+| t12 | ML_major-news |
+| t13 | CSMedicalImage |
+| t14 | InventoryMonitor |
+| t15 | ML-skinI |
+| t16 | CreditCardFraud |
+| t17 | CSAIassistant |
+| t18 | MicroProgram |
+| t19 | canvasGPT |
+| t20 | FraudulentAccount |
+| t21 | ML_Image_Colorization_Presentation |
+| t22 | SA-musicians |
+| t23 | ML_EngineFailure |
+| t24 | StockPrice |
+| t25 | DrunkDriver |
+| t26 | MLBrain_tumor |
+| t27 | ETF-risk |
+| t28 | DJ_Mixing_Recommendation_Final |
+| t29 | When_Does_ML_Fail_Presentation |
+| t30 | Mushroom |
+| t31 | ML-outfit |
+
+
+
+### Guide to students: How to PR? 
 
 For those who haven't submitted your project code yet, please follow the instructions below to upload your work to the course repository.
 

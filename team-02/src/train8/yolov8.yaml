@@ -1,0 +1,5 @@
+path: data/derived/yolo_plastic
+train: images/train
+val: images/val
+test: images/test
+names: [plastic]

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="nav-offset">
+    <div class="container">
+        <div class="flex justify-between items-center mb-3">
+            <div class="bodoni" style="font-size: 2.5rem;">My Schedule</div>
+            {% if schedule %}
+            <form action="/schedule/clear" method="post" style="margin: 0;">
+                <input type="hidden" name="user_id" value="{{ user_id }}">
+                <button type="submit" class="btn btn-danger btn-sm">🗑️ Clear All</button>
+            </form>
+            {% endif %}
+        </div>
+    
+    {% if schedule %}
+    <!-- Schedule Summary -->
+    <div class="card mb-3">
+        <h4 class="mb-2">📋 Enrolled Courses ({{ schedule | length }})</h4>
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));">
+            {% for item in schedule %}
+            <div class="course-card" style="padding: 1rem;">
+                <div class="course-header">
+                    <span class="course-code">{{ item.course_id }}</span>
+                </div>
+                <h4 class="course-title" style="font-size: 0.9rem;">{{ item.title }}</h4>
+                <div class="course-meta" style="font-size: 0.75rem;">
+                    <span>📅 {{ item.days }}</span>
+                    <span>🕐 {{ item.start_time }} - {{ item.end_time }}</span>
+                </div>
+                <form action="/schedule/remove" method="post" style="margin-top: 0.75rem;">
+                    <input type="hidden" name="user_id" value="{{ user_id }}">
+                    <input type="hidden" name="course_id" value="{{ item.course_id }}">
+                    <input type="hidden" name="section_id" value="{{ item.section_id }}">
+                    <button type="submit" class="btn btn-ghost btn-sm" style="width: 100%;">Remove</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Weekly Calendar View -->
+    <div class="card">
+        <h4 class="mb-2">📆 Weekly View</h4>
+        <div class="schedule-container">
+            <div class="schedule-grid">
+                <!-- Header Row -->
+                <div class="schedule-header"></div>
+                {% for day in days %}
+                <div class="schedule-header">{{ day }}</div>
+                {% endfor %}
+                
+                <!-- Time Rows -->
+                {% for time_slot in time_slots %}
+                <div class="schedule-time">{{ time_slot }}</div>
+                {% for day in days %}
+                <div class="schedule-cell">
+                    {% for item in calendar[day] %}
+                        {# Extract hour from time slot (e.g., "9:00 AM" -> 9) #}
+                        {% set slot_parts = time_slot.split(':') %}
+                        {% set slot_hour = slot_parts[0] | int %}
+                        {% set slot_is_pm = 'PM' in time_slot %}
+                        {% if slot_is_pm and slot_hour != 12 %}
+                            {% set slot_hour_24 = slot_hour + 12 %}
+                        {% elif not slot_is_pm and slot_hour == 12 %}
+                            {% set slot_hour_24 = 0 %}
+                        {% else %}
+                            {% set slot_hour_24 = slot_hour %}
+                        {% endif %}
+                        
+                        {# Extract hour from item start time (e.g., "9:00 AM" -> 9) #}
+                        {% if item.start_time and ':' in item.start_time %}
+                            {% set item_parts = item.start_time.split(':') %}
+                            {% set item_hour = item_parts[0] | int %}
+                            {% set item_is_pm = 'PM' in item.start_time %}
+                            {% if item_is_pm and item_hour != 12 %}
+                                {% set item_hour_24 = item_hour + 12 %}
+                            {% elif not item_is_pm and item_hour == 12 %}
+                                {% set item_hour_24 = 0 %}
+                            {% else %}
+                                {% set item_hour_24 = item_hour %}
+                            {% endif %}
+                            
+                            {% if item_hour_24 == slot_hour_24 %}
+                            <div class="schedule-item">
+                                <div class="schedule-item-title">{{ item.course_id }}</div>
+                                <div class="schedule-item-time">{{ item.start_time }} - {{ item.end_time }}</div>
+                            </div>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+    <div class="empty-state card">
+        <div class="empty-icon">📅</div>
+        <h3 class="empty-title">Your schedule is empty</h3>
+        <p class="empty-desc">Browse courses and add them to your schedule to see them here.</p>
+        <a href="/courses" class="btn btn-primary mt-3">Browse Courses</a>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
+

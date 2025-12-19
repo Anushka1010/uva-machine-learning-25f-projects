@@ -1,0 +1,132 @@
+# Fair Credit Score Prediction Model - Configuration File
+# All magic numbers and thresholds are centralized here!
+
+paths:
+  data_dir: "data"
+  output_dir: "outputs"
+  explanations_dir: "explanations"
+  reports_dir: "reports"
+  models_dir: "models"
+
+cdi:
+  # Composite Disadvantage Index factors
+  # Each factor adds 1 point to the CDI score
+  factors:
+    Education: "High School"
+    Residence_Type: "Rented"
+    Marital_Status: "Single"
+    Gender: "Female"
+  # Minimum CDI score to be considered disadvantaged
+  threshold: 2
+  proxy_column: "Proxy_Disadvantaged"
+
+fairness:
+  # Post-processing threshold adjustments
+  threshold_privileged: 0.5
+  threshold_unprivileged: 0.4  # Lower threshold = more approvals for disadvantaged group
+  
+  # Fairness metric targets
+  target_disparate_impact_ratio: 0.80  # Legal minimum (ideal > 0.95)
+  target_statistical_parity_diff: 0.05  # Maximum acceptable (ideal < 0.02)
+  target_equalized_odds_diff: 0.10  # Maximum acceptable (ideal < 0.05)
+  
+  apply_reweighting: true
+
+model:
+  xgb_params:
+    objective: "binary:logistic"
+    eval_metric: "logloss"
+    use_label_encoder: false
+    random_state: 42
+  
+  test_size: 0.2
+  random_state: 42
+  stratify: true
+  
+  target_column: "Creditworthiness"
+  columns_to_drop_for_training:
+    - "Proxy_Disadvantaged"
+    - "Credit_Score"
+
+explainability:
+  num_samples_to_explain: 5
+  random_seed: 42
+  
+  use_shap: true
+  save_shap_summary_plot: true
+  
+  use_lime: true
+  lime_num_features: 10
+  
+  strong_influence_threshold: 0.5
+  moderate_influence_threshold: 0.1
+
+data:
+  numeric_columns:
+    - "Income"
+    - "Debt"
+    - "Loan_Amount"
+    - "Loan_Term"
+    - "Num_Credit_Cards"
+    - "Credit_Score"
+    - "Creditworthiness"
+  
+  categorical_columns:
+    - "Gender"
+    - "Education"
+    - "Payment_History"
+    - "Employment_Status"
+    - "Residence_Type"
+    - "Marital_Status"
+  
+  derived_features:
+    - "Debt_to_Income"
+    - "Loan_to_Income"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  log_to_file: true
+  log_file: "logs/credit_prediction.log"
+
+tuning:
+  search_type: "random"  # or grid
+  cv_folds: 5
+  n_iter: 50
+  param_grid:
+    max_depth: [3, 5, 7, 9]
+    learning_rate: [0.01, 0.05, 0.1, 0.2]
+    n_estimators: [50, 100, 200]
+    min_child_weight: [1, 3, 5]
+    subsample: [0.8, 0.9, 1.0]
+    colsample_bytree: [0.8, 0.9, 1.0]
+
+calibration:
+  enabled: true
+  method: "isotonic"  # or sigmoid
+  cv: "prefit"
+  calibration_fraction: 0.3
+
+cross_validation:
+  enabled: true
+  cv_folds: 5
+  metrics: ["roc_auc", "f1", "accuracy", "precision", "recall"]
+  stratified: true
+
+preprocessing:
+  validation:
+    enabled: true
+    fail_on_errors: false
+  scaling:
+    enabled: false
+    method: "standard"  # or robust
+    columns: []  # empty means all numeric
+  handle_unseen_categories: true
+
+visualization:
+  fairness_plots: true
+  calibration_plots: true
+  feature_importance_plots: true
+  dpi: 150
+  figsize: [14, 10]
+  style: "whitegrid"

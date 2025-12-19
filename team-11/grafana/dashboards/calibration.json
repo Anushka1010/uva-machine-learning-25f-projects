@@ -1,0 +1,336 @@
+{
+  "dashboard": {
+    "title": "Credit Model - Calibration & Performance",
+    "tags": ["credit", "calibration", "model"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 0,
+    "refresh": "1m",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Model Calibration Status",
+        "type": "stat",
+        "gridPos": {"h": 6, "w": 8, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "model_is_calibrated",
+            "refId": "A",
+            "legendFormat": "Is Calibrated"
+          }
+        ],
+        "description": "Indicates whether the model is using probability calibration (1=yes, 0=no)",
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              {
+                "type": "value",
+                "options": {
+                  "0": {"text": "Not Calibrated", "color": "yellow"},
+                  "1": {"text": "Calibrated", "color": "green"}
+                }
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "yellow"},
+                {"value": 1, "color": "green"}
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none",
+          "textMode": "value_and_name"
+        }
+      },
+      {
+        "id": 2,
+        "title": "Brier Score",
+        "type": "gauge",
+        "gridPos": {"h": 6, "w": 8, "x": 8, "y": 0},
+        "targets": [
+          {
+            "expr": "model_calibration_brier_score",
+            "refId": "A",
+            "legendFormat": "Brier Score"
+          }
+        ],
+        "description": "Mean squared error between predicted probabilities and outcomes. Lower is better. <0.10 is excellent, 0.10-0.15 is good, >0.20 is poor.",
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 0.10, "color": "yellow"},
+                {"value": 0.20, "color": "red"}
+              ]
+            },
+            "min": 0,
+            "max": 0.30,
+            "unit": "short",
+            "decimals": 4
+          }
+        },
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        }
+      },
+      {
+        "id": 3,
+        "title": "CV Score Summary",
+        "type": "stat",
+        "gridPos": {"h": 6, "w": 8, "x": 16, "y": 0},
+        "targets": [
+          {
+            "expr": "model_cv_score_mean",
+            "refId": "A",
+            "legendFormat": "Mean"
+          },
+          {
+            "expr": "model_cv_score_std",
+            "refId": "B",
+            "legendFormat": "Std Dev"
+          }
+        ],
+        "description": "Cross-validation scores from model training",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "decimals": 3
+          },
+          "overrides": [
+            {
+              "matcher": {"id": "byName", "options": "Mean"},
+              "properties": [
+                {
+                  "id": "thresholds",
+                  "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      {"value": 0, "color": "red"},
+                      {"value": 0.75, "color": "yellow"},
+                      {"value": 0.85, "color": "green"}
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {"id": "byName", "options": "Std Dev"},
+              "properties": [
+                {
+                  "id": "thresholds",
+                  "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      {"value": 0, "color": "green"},
+                      {"value": 0.02, "color": "yellow"},
+                      {"value": 0.05, "color": "red"}
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none"
+        }
+      },
+      {
+        "id": 4,
+        "title": "Brier Score Over Time",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 6},
+        "targets": [
+          {
+            "expr": "model_calibration_brier_score",
+            "refId": "A",
+            "legendFormat": "Brier Score"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "logBase": 1, "min": 0, "max": 0.30},
+          {"format": "short", "logBase": 1}
+        ],
+        "legend": {
+          "show": true,
+          "alignAsTable": true,
+          "avg": true,
+          "current": true,
+          "max": true,
+          "min": true
+        },
+        "thresholds": [
+          {"value": 0.10, "colorMode": "custom", "fillColor": "rgba(255, 255, 0, 0.1)", "line": true},
+          {"value": 0.20, "colorMode": "critical", "fillColor": "rgba(255, 0, 0, 0.1)", "line": true}
+        ],
+        "alert": {
+          "conditions": [
+            {
+              "evaluator": {"params": [0.20], "type": "gt"},
+              "operator": {"type": "and"},
+              "query": {"params": ["A", "5m", "now"]},
+              "reducer": {"params": [], "type": "avg"},
+              "type": "query"
+            }
+          ],
+          "executionErrorState": "alerting",
+          "frequency": "60s",
+          "handler": 1,
+          "name": "Poor Calibration Alert",
+          "message": "Model calibration has degraded. Brier score > 0.20. Consider recalibrating the model.",
+          "noDataState": "no_data",
+          "notifications": []
+        }
+      },
+      {
+        "id": 5,
+        "title": "Feature Drift Detection",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 14},
+        "targets": [
+          {
+            "expr": "model_feature_drift",
+            "refId": "A",
+            "legendFormat": "{{feature}}"
+          }
+        ],
+        "description": "Feature drift scores (0-1). Higher values indicate more drift from training distribution.",
+        "yaxes": [
+          {"format": "percentunit", "logBase": 1, "min": 0, "max": 1},
+          {"format": "short", "logBase": 1}
+        ],
+        "legend": {
+          "show": true,
+          "alignAsTable": true,
+          "avg": true,
+          "current": true,
+          "max": true,
+          "hideEmpty": true,
+          "hideZero": true
+        },
+        "thresholds": [
+          {"value": 0.1, "colorMode": "custom", "fillColor": "rgba(255, 255, 0, 0.1)", "line": true},
+          {"value": 0.3, "colorMode": "critical", "fillColor": "rgba(255, 0, 0, 0.1)", "line": true}
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Model Performance Summary",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 22},
+        "targets": [
+          {
+            "expr": "model_accuracy",
+            "refId": "A",
+            "format": "table",
+            "instant": true
+          },
+          {
+            "expr": "model_cv_score_mean",
+            "refId": "B",
+            "format": "table",
+            "instant": true
+          },
+          {
+            "expr": "model_cv_score_std",
+            "refId": "C",
+            "format": "table",
+            "instant": true
+          },
+          {
+            "expr": "model_calibration_brier_score",
+            "refId": "D",
+            "format": "table",
+            "instant": true
+          },
+          {
+            "expr": "model_is_calibrated",
+            "refId": "E",
+            "format": "table",
+            "instant": true
+          }
+        ],
+        "transformations": [
+          {
+            "id": "merge",
+            "options": {}
+          },
+          {
+            "id": "organize",
+            "options": {
+              "renameByName": {
+                "Value #A": "Accuracy",
+                "Value #B": "CV Mean",
+                "Value #C": "CV Std",
+                "Value #D": "Brier Score",
+                "Value #E": "Is Calibrated"
+              }
+            }
+          }
+        ],
+        "options": {
+          "showHeader": true
+        },
+        "fieldConfig": {
+          "overrides": [
+            {
+              "matcher": {"id": "byName", "options": "Accuracy"},
+              "properties": [
+                {"id": "unit", "value": "percentunit"},
+                {"id": "decimals", "value": 3},
+                {"id": "custom.displayMode", "value": "color-background"},
+                {
+                  "id": "thresholds",
+                  "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      {"value": 0, "color": "red"},
+                      {"value": 0.75, "color": "yellow"},
+                      {"value": 0.85, "color": "green"}
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {"id": "byName", "options": "Brier Score"},
+              "properties": [
+                {"id": "decimals", "value": 4},
+                {"id": "custom.displayMode", "value": "color-background"},
+                {
+                  "id": "thresholds",
+                  "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      {"value": 0, "color": "green"},
+                      {"value": 0.10, "color": "yellow"},
+                      {"value": 0.20, "color": "red"}
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": 7,
+        "title": "Calibration Recommendations",
+        "type": "text",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 22},
+        "options": {
+          "mode": "markdown",
+          "content": "## Calibration Guidelines\n\n### Brier Score Interpretation:\n- **< 0.10**: Excellent calibration\n- **0.10 - 0.15**: Good calibration\n- **0.15 - 0.20**: Acceptable calibration\n- **> 0.20**: Poor calibration - consider recalibrating\n\n### When to Recalibrate:\n1. Brier score > 0.20\n2. Significant feature drift detected\n3. Data distribution changes\n4. Every 3-6 months as precaution\n\n### Actions:\n```bash\n# Recalibrate model\npython -m src.main calibrate \\\n  --model-path models/credit_model.pkl \\\n  --data-path data/recent_data.csv\n\n# Evaluate calibration\npython -m src.main cv \\\n  --data-path data/validation_data.csv\n```\n\n### Monitoring:\n- Set up alerts for Brier score > 0.20\n- Monitor feature drift regularly\n- Track calibration status over time"
+        }
+      }
+    ]
+  }
+}

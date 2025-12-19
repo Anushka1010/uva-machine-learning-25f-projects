@@ -1,0 +1,114 @@
+# alerts.yml
+# Prometheus alerting rules for Fair Credit Prediction
+
+groups:
+  # ============================================
+  # Fairness Alerts (CRITICAL)
+  # ============================================
+  - name: fairness_alerts
+    rules:
+      - alert: DisparateImpactBelowThreshold
+        expr: fairness_disparate_impact < 0.80
+        for: 5m
+        labels:
+          severity: critical
+          team: ml-fairness
+        annotations:
+          summary: "⚠️ FAIRNESS VIOLATION: Disparate Impact below legal threshold"
+          description: "Disparate Impact ratio is {{ $value | printf \"%.3f\" }}, which is below the 0.80 legal threshold. Immediate action required."
+          runbook_url: "https://wiki.internal/runbooks/fairness-violation"
+
+      - alert: StatisticalParityViolation
+        expr: abs(fairness_statistical_parity_diff) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          team: ml-fairness
+        annotations:
+          summary: "Statistical Parity difference exceeds target threshold"
+          description: "Statistical Parity difference is {{ $value | printf \"%.3f\" }}, target is < 0.05"
+
+      - alert: EqualizedOddsViolation
+        expr: fairness_equalized_odds_diff > 0.10
+        for: 5m
+        labels:
+          severity: warning
+          team: ml-fairness
+        annotations:
+          summary: "Equalized Odds difference exceeds target threshold"
+          description: "Equalized Odds difference is {{ $value | printf \"%.3f\" }}, target is < 0.10"
+
+  # ============================================
+  # Performance Alerts
+  # ============================================
+  - name: performance_alerts
+    rules:
+      - alert: HighPredictionLatency
+        expr: histogram_quantile(0.95, rate(prediction_latency_seconds_bucket[5m])) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High prediction latency detected"
+          description: "95th percentile latency is {{ $value | printf \"%.2f\" }}s, exceeds 500ms threshold"
+
+      - alert: CriticalLatency
+        expr: histogram_quantile(0.99, rate(prediction_latency_seconds_bucket[5m])) > 1.0
+        for: 3m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Critical prediction latency"
+          description: "99th percentile latency is {{ $value | printf \"%.2f\" }}s, exceeds 1s threshold"
+
+  # ============================================
+  # Error Alerts
+  # ============================================
+  - name: error_alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(prediction_errors_total[5m]) / rate(predictions_total[5m]) > 0.01
+        for: 5m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "High prediction error rate"
+          description: "Error rate is {{ $value | printf \"%.2f\" }}%, exceeds 1% threshold"
+
+      - alert: NoRecentPredictions
+        expr: rate(predictions_total[10m]) == 0
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "No predictions in last 10 minutes"
+          description: "The API has not processed any predictions in the last 10 minutes. Check service health."
+
+  # ============================================
+  # Infrastructure Alerts
+  # ============================================
+  - name: infrastructure_alerts
+    rules:
+      - alert: ServiceDown
+        expr: up{job="fair-credit-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Fair Credit API service is down"
+          description: "The Fair Credit API service has been unreachable for more than 1 minute."
+
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes{job="fair-credit-api"} / 1024 / 1024 / 1024 > 3.5
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value | printf \"%.1f\" }}GB, approaching 4GB limit"

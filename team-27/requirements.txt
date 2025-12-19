@@ -1,0 +1,15 @@
+# Core scientific computing
+numpy
+pandas
+
+# Visualization
+matplotlib
+
+# Machine learning
+scikit-learn
+
+# Financial data source
+yfinance
+
+# Model interpretability
+shap
